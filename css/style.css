@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+:root {
+  font-family: 'Raleway', sans-serif;
+  box-sizing: border-box;
+}
+/*
+color palatte
+#376E07,#85CFDD,#B7F47A,#7AEEF4,#7AF4D2,#376E07,#85CFDD,#B7F47A
+*/
+body {
+  background-color: #90EE90;
+}
+h1 {
+  color: white;
+  text-align: center;
+}
+header h1 {
+  font-size: 8rem;
+}
+h4 {
+  text-align: center;
+}
+nav ul {
+  display: block;
+  margin: 0 auto;
+}
+nav a {
+  text-decoration: none;
+}
+.container {
+  margin: 2em auto;
+  width: 95%;
+  border: 1px solid black;
+  padding: 0.5em
+}
+#board {
+  position: relative;
+  margin: 0 auto;
+  background-color: #376E07;
+  border-radius: 5px;
+  min-height: 65vh;
+  padding: 3em;
+  transition: height .5s linear;
+}
+.onBoard p {
+  text-align: center;
+}
+.row {
+  width: 95%;
+  margin: 0 auto;
+}
+.active {
+  border-bottom: 1px solid orange;
+}
+.userHand {
+  background-color: black;
+  border: 1px black solid;
+  border-bottom: none;
+  margin: 1em 0;
+  min-height: 30vh;
+}
+.clicked {
+  border: 2px solid green;
+}
+.currentTurn {
+  border: 2px solid yellow;
+}
+.playerHandButtons {
+  width: fit-content;
+  margin: .5em auto;
+}
+.numOfPlayers {
+  font-size: 1.5rem;
+  color: black;
+  background-color: white;
+  border: none;
+  display: block;
+  margin: 1em auto;
+  padding: 1em;
+  border-radius: 10px;
+}
+.numOfPlayers:hover {
+  color: white;
+  background-color: #376E07;
+  transition: .2s linear;
+}
+form p {
+  text-align: center;
+  padding: 0;
+  background-color: inherit;
+  color: black;
+}
+button {
+  outline: 0;
+}
+.hand button img {
+  height: 11vh;
+  width: 9vh;
+}
+#rules {
+  border-bottom: 1px black solid;
+  font-size: 1.5rem;
+  letter-spacing: .05em;
+}
+#rules li {
+  margin-bottom: .2em;
+}
+#playArea img {
+  background-color: white;
+  height: 10vh;
+  width: 8vh;
+}
+#playArea img.lastPlayed {
+  height: 15vh;
+  width: 12vh;
+  margin: .2em;
+}
+#board p {
+  text-align: center;
+  color: white;
+}
+#board .firstRow {
+  min-height: 30vh;
+}
+#board div {
+  transition: height 0.5s linear;
+}
+.form-group {
+  width: 33%;
+  margin: 1em auto;
+}
+.error {
+  color: red;
+  font-size: 1.5rem;
+}
