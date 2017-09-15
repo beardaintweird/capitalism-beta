@@ -32,10 +32,10 @@ var Db = (function(){
           'email'    : email
       });
     },
-    createTable(user){
+    createTable(user, callback){
       let tablesRef = this.dbRef.child('tables');
       let newTableKey = tablesRef.push().key;
-      this.joinTable(newTableKey, user);
+      this.joinTable(newTableKey, user, callback);
     },
     joinTable(key, user, callback){
       this.getOnePlayer(user.uid, function(res){

@@ -38,6 +38,7 @@ $(function(){
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       renderTableButtons();
+      addRemoveUsersInTables();
       $('#createTable').show();
       $('#signInSignUp').hide('blind');
       $('#signOutBtn').show('blind');
@@ -98,25 +99,31 @@ const startGame = function(){
 
 function renderTableButtons(){
   $('#tableBtnSection').remove();
+  // make the 'create table button'
   $('#formSection').append(`
         <section id="tableBtnSection">
           <div class="mx-auto">
-            <button id="tableBtn" type="button">
+            <button id="createTableBtn" type="button">
               Create a table
             </button>
           </div>
         </section>`);
-  $('#tableBtn').on('click',function(){
-    Db.createTable(firebase.auth().currentUser);
-    renderTableButtons();
-    $('#tableBtn').prop('disabled', true);
+  $('#createTableBtn').on('click',function(){
+    Db.createTable(firebase.auth().currentUser, function(){
+      // run this function again - to update the buttons
+      renderTableButtons();
+      // not sure why this is called...?
+      // TODO: should be done in child_added
+      addRemoveUsersInTables();
+    });
+    $('#createTableBtn').prop('disabled', true);
   });
 
-  let count = 0;
   Db.getTables(function(response){
     for (let table in response){
       existingTables.push(table);
       if(response.hasOwnProperty(table)){
+        // create the tables with the buttons
         if(!$(`#${table}`).length){
           $('#formSection').append(`
             <div class="table" id="${table}">
@@ -131,11 +138,13 @@ function renderTableButtons(){
               <button data-id="${table}" class="leaveTable">Leave table</button>
             </div>
             `);
+            // add users to table
             for(let user in response[table]){
               if(!$(`#${response[table][user].username}`).length){
                 if(user == firebase.auth().currentUser.uid){
                   console.log(`user ${user} is in table ${table}`);
                   console.log(`adding ${user} to ${table}`)
+                  // highlight the name if its the logged in user
                   $(`#${table} table tbody:last-child`)
                     .append(`<tr><td id="${response[table][user].username}"><strong>${response[table][user].username}</strong></td></tr>`);
                 } else {
@@ -148,27 +157,38 @@ function renderTableButtons(){
         }
       }
     }
-    addRemoveUsersInTables();
     $('.joinTable').on('click', function(e){
       Db.joinTable($(this)[0].dataset.id, firebase.auth().currentUser, function(player){
+        // turn the proper tables on, other tables off
+        // REFACTOR: turn the join table buttons off
         toggleTableButtons();
+        // should be done automatically by child_added
+        addRemoveUsersInTables();
       });
     });
     $('.leaveTable').on('click', function(e){
       Db.leaveTable($(this)[0].dataset.id, firebase.auth().currentUser, function(player){
+        // TODO: just turn off the leave table buttons
         toggleTableButtons();
+        // should be done in child_removed
+        addRemoveUsersInTables();
       });
     });
   });
 }
 function addRemoveUsersInTables(){
+  console.log('here in add remove users');
+  // goes through the existing tables and sets the child event listeners
+  // TODO: should only be called once.
+  // TODO: do it once at the beginning for all existing tables, again when a new
+  // table is created
   for(let i = 0; i < existingTables.length; i++){
     Db.dbRef.child(`tables/${existingTables[i]}`).on('child_added', (res)=>{
       let user  = res.val().username;
       let table = existingTables[i];
       if(!$(`#${user}`).length){
-        console.log(currentPlayer.uid, firebase.auth().currentUser.uid)
-        if(currentPlayer.uid == firebase.auth().currentUser.uid){
+        console.log(currentPlayer.username, res.val().username);
+        if(currentPlayer.username == user){
           console.log(`user ${user} is in table ${table}`);
           console.log(`adding ${user} to ${table}`)
           $(`#${table} table tbody:last-child`)
@@ -181,6 +201,24 @@ function addRemoveUsersInTables(){
       }
     });
     Db.dbRef.child(`tables/${existingTables[i]}`).on('child_removed', (res)=>{
+      console.log('child removed');
+      Db.getTables(function(tables){
+        let doesTableExist = false;
+        if(!tables) {
+          $('#${existingTables[i]}').remove();
+        }
+        for(let table in tables){
+          if(table == existingTables[i]){
+            doesTableExist = true;
+          }
+        }
+        console.log(doesTableExist);
+        if(!doesTableExist){
+          $(`#${existingTables[i]}`).hide('slow', function(){
+            $(`#${existingTables[i]}`).remove();
+          });
+        }
+      });
       if($(`#${res.val().username}`).length){
         $(`#${res.val().username}`).fadeOut();
         $(`#${res.val().username}`).remove();
@@ -189,6 +227,7 @@ function addRemoveUsersInTables(){
   }
 }
 function toggleTableButtons(){
+  // enables and disables table buttons based on the player having a table or not
     Db.getOnePlayer(currentPlayer.uid, function(player){
       for(let prop in player){
         if(player.hasOwnProperty(prop)){
