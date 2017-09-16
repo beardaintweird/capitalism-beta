@@ -94,6 +94,7 @@ const startGame = function() {
   players = Game.assignHands(true, piles, players);
   Game.play(true, players);
 }
+
 // makes the create table button
 function renderCreateTableButton() {
   $('#tableBtnSection').remove();
@@ -112,7 +113,6 @@ function renderCreateTableButton() {
     $('.joinTable').prop('disabled', true);
   });
 }
-
 function assignListeners() {
   Db.dbRef.child('tables').on('child_added', (table) => {
     renderTable(table);
@@ -127,7 +127,6 @@ function assignListeners() {
     destroyTable(table);
   })
 }
-
 function renderTable(table) {
   // creates the table
   $('#formSection').append(`
@@ -145,7 +144,6 @@ function renderTable(table) {
     `);
 
   // toggles the disabled property on the join and leave buttons
-  console.log('current player has table', currentPlayer.hasTable);
   if(currentPlayer.hasTable){
     if(table.val()[currentPlayer.uid]){
       $(`.leaveTable[data-id='${table.key}']`).prop('disabled', false);
@@ -156,7 +154,6 @@ function renderTable(table) {
     $('.leaveTable').prop('disabled', true);
     $('.joinTable').prop('disabled', false);
   }
-
   $('.joinTable').unbind().on('click', function(e) {
     let tableKey = $(this)[0].dataset.id;
     Db.joinTable(tableKey, firebase.auth().currentUser, function(){
