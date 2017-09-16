@@ -6,6 +6,7 @@ var Game = App.Game();
 var Db = App.Db();
 let currentPlayer = null;
 let existingTables = [];
+let countdown = null;
 
 // gets number of keys in an object
 function getObjectSize(obj) {
@@ -16,14 +17,7 @@ function getObjectSize(obj) {
   }
   return size;
 };
-$("#startGame").on('click', function(e) {
-  out($(this));
-  e.preventDefault();
-  out($("[type='number']").val())
-  Game.numOfPlayers = parseInt($("[type='number']").val()) || 4;
-  console.log(Game.numOfPlayers, parseInt($("[type='number']").val()))
-  startGame();
-});
+
 $('#rulesContainer').hide();
 $('#toggleRules').on('click', function() {
   if ($('#rulesContainer').css('display') === 'none') {
@@ -48,15 +42,14 @@ $(function() {
       Db.getOnePlayer(uid, function(user) {
         currentPlayer = user;
         currentPlayer.uid = uid;
-        console.log(currentPlayer);
         assignListeners();
         return Db.printUsername(user);
       });
-      out(`name: ${name}, email: ${email}, uid: ${uid}`);
     } else {
       // No user is signed in.
       out('no user is signed in');
       $('#createTable').hide();
+      $('#numberOfPlayers').hide();
       $('#gameContainer').hide();
       $('#username').remove();
       $('#signInSignUp').show('blind');
@@ -85,15 +78,7 @@ $('#signOutBtn').on('click', function(e) {
   e.preventDefault();
   Db.signOutUser();
 })
-const startGame = function() {
-  let deck = Cards.createDeck();
-  // shuffle
-  deck = Cards.shuffle(deck);
-  var piles = Game.deal(deck);
-  var players = Game.createPlayers();
-  players = Game.assignHands(true, piles, players);
-  Game.play(true, players);
-}
+
 
 // makes the create table button
 function renderCreateTableButton() {
@@ -102,40 +87,37 @@ function renderCreateTableButton() {
   $('#formSection').append(`
         <section id="tableBtnSection">
           <div class="mx-auto">
+            <input type="number" min=4 max=8 id="numberOfPlayers">
             <button id="createTableBtn" type="button">
               Create a table
             </button>
           </div>
         </section>`);
   $('#createTableBtn').on('click', function() {
-    Db.createTable(firebase.auth().currentUser, null);
+    let numberOfPlayers = $('#numberOfPlayers').val();
+    Db.createTable(firebase.auth().currentUser, numberOfPlayers, null);
     $('#createTableBtn').prop('disabled', true);
     $('.joinTable').prop('disabled', true);
   });
 }
 function assignListeners() {
   Db.dbRef.child('tables').on('child_added', (table) => {
-    let numOfPlayers = 0;
+    let playersInTable = 0;
     renderTable(table);
-    Db.dbRef.child('tables/' + table.key).on('child_added', (user) => {
-      numOfPlayers++;
-
+    Db.dbRef.child('tables/' + table.key).child('members').on('child_added', (user) => {
+      playersInTable++;
+      displayNumberOfPlayers(playersInTable, table);
       renderUser(user, table);
-      if(numOfPlayers > 3){
-        // can start game
-
-        if(numOfPlayers == 8){
-          $(`.joinTable[data-id=${table.key}]`).prop('disabled', true);
-        }
+      if(playersInTable == parseInt(table.val().numberOfPlayers)){
+        $(`.joinTable[data-id='${table.key}']`).prop('disabled', true);
+        startCountdown(true, table);
       }
     });
-    Db.dbRef.child('tables/'+table.key).on('child_removed', (user)=>{
-      numOfPlayers--;
-      displayNumberOfPlayers(numOfPlayers, table);
+    Db.dbRef.child('tables/'+table.key).child('members').on('child_removed', (user)=>{
+      playersInTable--;
+      displayNumberOfPlayers(playersInTable, table);
       destroyUser(user,table);
-      if(numOfPlayers < 4){
-        // cannot start game
-      }
+      startCountdown(false);
     })
   });
   Db.dbRef.child('tables').on('child_removed', (table)=>{
@@ -148,8 +130,7 @@ function renderTable(table) {
     <div class="table" id="${table.key}">
       <table>
         <thead>
-          <tr><th>${table.key}</th></tr>
-          <tr><span class="numOfPlayers" data-id="${table.key}"></span></tr>
+          <tr><th>${table.key} <span class="playersInTable" data-id="${table.key}"></span></th></tr>
         </thead>
         <tbody>
         </tbody>
@@ -161,11 +142,12 @@ function renderTable(table) {
 
   // toggles the disabled property on the join and leave buttons
   if(currentPlayer.hasTable){
-    if(table.val()[currentPlayer.uid]){
+    if(table.val().members[currentPlayer.uid]){
       $(`.leaveTable[data-id='${table.key}']`).prop('disabled', false);
     }
     $('.joinTable').prop('disabled', true);
     $('#createTableBtn').prop('disabled', true);
+    $('#numberOfPlayers').prop('disabled', true);
   } else {
     $('.leaveTable').prop('disabled', true);
     $('.joinTable').prop('disabled', false);
@@ -175,6 +157,8 @@ function renderTable(table) {
     Db.joinTable(tableKey, firebase.auth().currentUser, function(){
       $('.joinTable').prop('disabled', true);
       $(`.leaveTable[data-id='${tableKey}']`).prop('disabled', false);
+      $('#createTableBtn').prop('disabled', true);
+      $('#numberOfPlayers').prop('disabled', true);
     });
   });
   $('.leaveTable').unbind().on('click', function(e) {
@@ -182,18 +166,17 @@ function renderTable(table) {
       $('.leaveTable').prop('disabled', true);
       $('.joinTable').prop('disabled', false);
       $('#createTableBtn').prop('disabled', false);
+      $('#numberOfPlayers').prop('disabled', false);
     });
   });
 }
 function renderUser(user, table) {
   let username = user.val().username;
   if (user.key == firebase.auth().currentUser.uid) {
-    console.log(`adding ${username} to ${table.key}`)
     // highlight the name if its the logged in user
     $(`#${table.key} table tbody:last-child`)
       .append(`<tr id="${username}"><td><strong>${username}</strong></td></tr>`);
   } else {
-    console.log(`adding ${username} to ${table.key}`)
     $(`#${table.key} table tbody:last-child`)
       .append(`<tr id="${username}"><td >${username}</td></tr>`);
   }
@@ -208,6 +191,44 @@ function destroyTable(table){
   $(`#${table.key}`).fadeOut(300, function() { $(this).remove(); });
 }
 function displayNumberOfPlayers(num, table){
-  console.log(`Users in ${table.key}`, numOfPlayers);
-  $(`.numOfPlayers[data-id='${table.key}']`).html(`<strong>${num}</strong> out of 8`)
+  $(`.playersInTable[data-id='${table.key}']`).html(`<strong>${num}</strong> out of 8`)
+}
+function startCountdown(shouldStartGame, table){
+  if(shouldStartGame){
+    let count = 5;
+    $(`#${table.key}`).append(`<p class="countdown" data-id="${table.key}">Game starts in ${count}</p>`);
+    countdown = setInterval(()=>{
+      $(`.countdown[data-id='${table.key}']`).text(`Game starts in ${count}`);
+      count--;
+      if(count == 0){
+        startGame();
+        stopInterval(countdown);
+      }
+    }, 1000);
+  } else {
+    if(countdown) {
+      $(`.countdown[data-id='${table.key}']`).remove();
+      stopInterval(countdown);
+    }
+  }
+}
+function stopInterval(intervalFunction){
+  clearInterval(intervalFunction);
+  intervalFunction = undefined;
+}
+const startGame = function() {
+  console.log(currentPlayer);
+  if(currentPlayer.admin){
+    console.log('Admin shuffling the cards & dealing');
+    let deck = Cards.createDeck();
+    // shuffle
+    deck = Cards.shuffle(deck);
+    var piles = Game.deal(deck);
+  } else {
+    // launch the rest of the players into the game
+    console.log('Game starting now!!!');
+  }
+  // var players = Game.createPlayers();
+  // players = Game.assignHands(true, piles, players);
+  // Game.play(true, players);
 }

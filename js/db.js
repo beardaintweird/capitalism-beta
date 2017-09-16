@@ -32,9 +32,17 @@ var Db = (function(){
           'email'    : email
       });
     },
-    createTable(user, callback){
+    createTable(user, numberOfPlayers, callback){
       let tablesRef = this.dbRef.child('tables');
       let newTableKey = tablesRef.push().key;
+      this.dbRef.child('tables').update({
+        [newTableKey]: {
+          'numberOfPlayers':numberOfPlayers
+        }
+      });
+      this.dbRef.child('players').child(user.uid).update({
+        admin: true
+      });
       this.joinTable(newTableKey, user, callback);
     },
     joinTable(key, user, callback){
@@ -44,7 +52,7 @@ var Db = (function(){
           hasTable: true,
           table: key
         });
-        this.Db.dbRef.child('tables').child(key).update({
+        this.Db.dbRef.child('tables/'+key).child('members').update({
           [user.uid] : {
             'username': res.username
           }
@@ -58,7 +66,7 @@ var Db = (function(){
           hasTable: false,
           table: null
         });
-        this.Db.dbRef.child('tables').child(key).update({
+        this.Db.dbRef.child('tables/'+key).child('members').update({
           [user.uid]: null
         });
         if(callback) callback(res);
