@@ -115,12 +115,27 @@ function renderCreateTableButton() {
 }
 function assignListeners() {
   Db.dbRef.child('tables').on('child_added', (table) => {
+    let numOfPlayers = 0;
     renderTable(table);
     Db.dbRef.child('tables/' + table.key).on('child_added', (user) => {
+      numOfPlayers++;
+
       renderUser(user, table);
+      if(numOfPlayers > 3){
+        // can start game
+
+        if(numOfPlayers == 8){
+          $(`.joinTable[data-id=${table.key}]`).prop('disabled', true);
+        }
+      }
     });
     Db.dbRef.child('tables/'+table.key).on('child_removed', (user)=>{
+      numOfPlayers--;
+      displayNumberOfPlayers(numOfPlayers, table);
       destroyUser(user,table);
+      if(numOfPlayers < 4){
+        // cannot start game
+      }
     })
   });
   Db.dbRef.child('tables').on('child_removed', (table)=>{
@@ -134,6 +149,7 @@ function renderTable(table) {
       <table>
         <thead>
           <tr><th>${table.key}</th></tr>
+          <tr><span class="numOfPlayers" data-id="${table.key}"></span></tr>
         </thead>
         <tbody>
         </tbody>
@@ -190,4 +206,8 @@ function destroyUser(user,table){
 function destroyTable(table){
   console.log('removing table:',table.key);
   $(`#${table.key}`).fadeOut(300, function() { $(this).remove(); });
+}
+function displayNumberOfPlayers(num, table){
+  console.log(`Users in ${table.key}`, numOfPlayers);
+  $(`.numOfPlayers[data-id='${table.key}']`).html(`<strong>${num}</strong> out of 8`)
 }
