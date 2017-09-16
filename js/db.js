@@ -38,27 +38,28 @@ var Db = (function(){
       this.joinTable(newTableKey, user, callback);
     },
     joinTable(key, user, callback){
+      // console.log('In join table',`table: ${key}, user: ${user.uid}`);
       this.getOnePlayer(user.uid, function(res){
+        this.Db.dbRef.child('players').child(user.uid).update({
+          hasTable: true,
+          table: key
+        });
         this.Db.dbRef.child('tables').child(key).update({
           [user.uid] : {
             'username': res.username
           }
-        });
-        this.Db.dbRef.child('players').child(user.uid).update({
-          hasTable: true,
-          table: key
         });
         if(callback) callback(res);
       });
     },
     leaveTable(key,user, callback){
       this.getOnePlayer(user.uid, function(res){
-        this.Db.dbRef.child('tables').child(key).update({
-          [user.uid]: null
-        });
         this.Db.dbRef.child('players').child(user.uid).update({
           hasTable: false,
           table: null
+        });
+        this.Db.dbRef.child('tables').child(key).update({
+          [user.uid]: null
         });
         if(callback) callback(res);
       });
