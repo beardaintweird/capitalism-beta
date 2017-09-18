@@ -27,8 +27,6 @@ $('#toggleRules').on('click', function() {
   }
 });
 $('#gameContainer').hide();
-
-
 $(function() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
