@@ -115,7 +115,7 @@ function assignListeners() {
       playersInTable--;
       displayNumberOfPlayers(playersInTable, table);
       destroyUser(user,table);
-      startCountdown(false);
+      startCountdown(false, table);
     })
   });
   Db.dbRef.child('tables').on('child_removed', (table)=>{
@@ -197,11 +197,12 @@ function startCountdown(shouldStartGame, table){
     $(`#${table.key}`).append(`<p class="countdown" data-id="${table.key}">Game starts in ${count}</p>`);
     countdown = setInterval(()=>{
       $(`.countdown[data-id='${table.key}']`).text(`Game starts in ${count}`);
-      count--;
       if(count == 0){
         startGame();
         stopInterval(countdown);
+        $(`.countdown[data-id='${table.key}']`).remove();
       }
+      count--;
     }, 1000);
   } else {
     if(countdown) {
@@ -217,16 +218,61 @@ function stopInterval(intervalFunction){
 const startGame = function() {
   console.log(currentPlayer);
   if(currentPlayer.admin){
+    let newGameKey = Db.createGameKey();
+
     console.log('Admin shuffling the cards & dealing');
     let deck = Cards.createDeck();
     // shuffle
     deck = Cards.shuffle(deck);
     var piles = Game.deal(deck);
+    let players = Game.createPlayers();
+    players = Game.assignHands(true,piles,players);
+    console.log('players in normal game creation', players);
+    Db.getOneTable(currentPlayer.table, (res) => {
+      let count = 0;
+      for(let player in res.members){
+        players[0].uid = player;
+        players[0].username = res.members[player].username;
+        Db.dbRef.child('games').child(newGameKey).update({
+          [player]: players[0]
+        });
+      }
+    });
+    // console.log(players);
+    // write to the database
+    // everything should be on the database from here on
+    // push players up with:
+    //  -- uid
+    //  -- username
+    //  -- hand (update everytime they play a card(s))
+    //  -- player position
+    //  -- previous ranking
+    //  -- current ranking
+    // push playArea up with:
+    //  -- array of cards played (all cards)
+    //  -- current pile (cards just played | only really need to maintain last 4)
+    // push piles up with:
+    //  -- light: boolean
+    //  -- cards array
+    //    -- be ready to get top card and next card after that if a match on another pile
+    /*
+    games
+      / game-key
+        / players
+          / player-keys OR uid OR username
+            / player info
+        / playArea
+          / current playArea
+          / all cards played so far
+        / rankings?
+        / game started/ended
+        / piles
+          / pile key?
+            / pile info
+    */
   } else {
     // launch the rest of the players into the game
     console.log('Game starting now!!!');
   }
-  // var players = Game.createPlayers();
-  // players = Game.assignHands(true, piles, players);
   // Game.play(true, players);
 }

@@ -26,6 +26,14 @@ var Db = (function(){
       });
       return response;
     },
+    getOneTable(tableKey, callback){
+      let response = null;
+      this.dbRef.child('tables/'+tableKey).once('value').then((res) => {
+        response = res.val();
+        console.log(response);
+        if(callback) callback(response);
+      })
+    },
     createPlayer(playerId, username, email){
       this.dbRef.child('players').child(playerId).set({
           'username' : username,
@@ -71,6 +79,12 @@ var Db = (function(){
         });
         if(callback) callback(res);
       });
+    },
+    createGameKey(){
+      let gamesRef = this.dbRef.child('games');
+      let newGameKey = gamesRef.push().key;
+      console.log(newGameKey);
+      return newGameKey;
     },
     createNewUser(email, password, name){
       if(email && name){
