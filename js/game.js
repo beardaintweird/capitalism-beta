@@ -62,7 +62,14 @@ var Game = (function(){
         // logic for games after the first
       }
     },
-    renderHands(players, turn){
+    /*
+    TODO: change this to render only the current player's hand
+          pass the player's hand
+          pass the current player
+          render the other buttons as well
+          -- next: renderDoublesTriplesQuads --
+    */
+    renderHands(players){
       for(let i = 0, x = this.players.length; i < x; i++){
         this.players[i].hand.cards.sort((a,b)=> a.rank - b.rank);
         if($(`#p${this.players[i].number}-hand`).length){
@@ -112,7 +119,7 @@ var Game = (function(){
         return this.changeTurns(turn);
       }
       console.log(`It's player ${turn.number}'s turn`, turn);
-      let z = turn.hand.cards;
+      let currentHand = turn.hand.cards;
       let selectedCard = null;
       let cardPlayed = 0;
       //
@@ -129,15 +136,15 @@ var Game = (function(){
       if(isFirstGame){
         $(`.passBtn`).prop('disabled',true);
         // play the 3 of clubs
-        z.map((x,i)=>{
+        currentHand.map((x,i)=>{
           if(x.title === 3 && x.suit === 'clubs') {
             cardPlayed = i;
           }
         });
         // remove the 3 of clubs
-        $(`.player${turn.number}-hand.${z[cardPlayed].title}of${z[cardPlayed].suit}`).remove();
+        $(`.player${turn.number}-hand.${currentHand[cardPlayed].title}of${currentHand[cardPlayed].suit}`).remove();
         //render it being played
-        this.renderPlay(z.splice(cardPlayed, 1)[0], turn.number);
+        this.renderPlay(currentHand.splice(cardPlayed, 1)[0], turn.number);
         // change turns to the next player
         this.changeTurns(turn);
         return this.checkForCompletions(turn);
@@ -154,7 +161,7 @@ var Game = (function(){
           if(this == selectedCard){
             const playMultiples = function(num, str){
               let card = null;
-              let set = z.filter((x,i) =>{
+              let set = currentHand.filter((x,i) =>{
                 return parseInt(selectedCard.value) === x.rank;
               });
               return (function(){
@@ -163,11 +170,11 @@ var Game = (function(){
                   if(num === 3) this.Game.isTriplesOnly = true;
                 }
                 for(let j = 0; j < num; j++){
-                  z.map((x,i)=>{
+                  currentHand.map((x,i)=>{
                     if(set[j].rank == x.rank)
                       cardPlayed = i;
                   });
-                  card = z.splice(cardPlayed,1)[0];
+                  card = currentHand.splice(cardPlayed,1)[0];
                   this.Game.renderPlay(card,turn.number);
                   if(num === 2 && j === 1){
                     let playArea = this.Game.playArea;
@@ -197,7 +204,7 @@ var Game = (function(){
             // checks if a double was selected
             if($(this).attr('class').match(/double/gi) && $(this).attr('class').match(/double/gi)[0] == 'double'){
               console.log('selected a double');
-              let set = z.filter((x,i) =>{
+              let set = currentHand.filter((x,i) =>{
                 return parseInt(selectedCard.value) === x.rank;
               });
               return playMultiples(2);
@@ -205,14 +212,14 @@ var Game = (function(){
             // checks if a triple was selected
             if($(this).attr('class').match(/triple/gi) && $(this).attr('class').match(/triple/gi)[0] == 'triple'){
               console.log('selected a triple');
-              let set = z.filter((x,i) =>{
+              let set = currentHand.filter((x,i) =>{
                 return parseInt(selectedCard.value) === x.rank;
               })
               return playMultiples(3);
             }
             // checks if auto-completion was selected
             if($(this).attr('class').match(/quad/gi) && $(this).attr('class').match(/quad/gi)[0] == 'quad'){
-              let set = z.filter((x,i)=>{
+              let set = currentHand.filter((x,i)=>{
                 return parseInt(selectedCard.value) === x.rank;
               });
               return playMultiples(4);
@@ -220,12 +227,12 @@ var Game = (function(){
             const playCard = function(){
               let card = null;
               //finds the proper card
-              z.map((x,i)=>{
+              currentHand.map((x,i)=>{
                 if(selectedCard.value == x.rank)
                   cardPlayed = i;
               });
               // removes it from the player's hand
-              card = z.splice(cardPlayed, 1)[0];
+              card = currentHand.splice(cardPlayed, 1)[0];
               // checks if it was a bomb
               if(parseInt(selectedCard.value) === 13){
                 // gotta play the card
@@ -497,6 +504,11 @@ var Game = (function(){
         }
       }
     },
+    /*
+    TODO: Call this when it's their turn
+          pass in the player
+          pass in the hand
+    */
     renderDoublesTriplesQuads(turn){
       $(`#p${turn.number}-hand`)
       .append('<br>');

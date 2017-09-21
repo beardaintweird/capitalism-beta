@@ -43,6 +43,7 @@ $(function() {
         assignListeners();
         return Db.printUsername(user);
       });
+      // add functionality to skip all other steps if the user is in a game
     } else {
       // No user is signed in.
       out('no user is signed in');
@@ -228,17 +229,8 @@ const startGame = function() {
     let players = Game.createPlayers();
     players = Game.assignHands(true,piles,players);
     console.log('players in normal game creation', players);
-    Db.getOneTable(currentPlayer.table, (res) => {
-      let count = 0;
-      for(let player in res.members){
-        players[0].uid = player;
-        players[0].username = res.members[player].username;
-        Db.dbRef.child('games').child(newGameKey).update({
-          [player]: players[0]
-        });
-      }
-    });
-    // console.log(players);
+    Db.createPlayersForGame(currentPlayer.table, players, newGameKey);
+
     // write to the database
     // everything should be on the database from here on
     // push players up with:

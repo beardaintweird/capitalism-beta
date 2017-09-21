@@ -40,6 +40,20 @@ var Db = (function(){
           'email'    : email
       });
     },
+    createPlayersForGame(table, players, newGameKey){
+      Db.getOneTable(currentPlayer.table, (res) => {
+        let count = 0;
+        for(let player in res.members){
+          // creating players
+          players[count].uid = player;
+          players[count].username = res.members[player].username;
+          Db.dbRef.child('games').child(newGameKey).update({
+            [player]: players[count]
+          });
+          count++;
+        }
+      });
+    },
     createTable(user, numberOfPlayers, callback){
       let tablesRef = this.dbRef.child('tables');
       let newTableKey = tablesRef.push().key;
