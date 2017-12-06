@@ -1,6 +1,7 @@
 'use strict';
 const out = console.log;
 out('js connected');
+
 var Cards = App.Cards();
 var Game = App.Game();
 var Db = App.Db();
@@ -230,7 +231,7 @@ const startGame = function() {
     players = Game.assignHands(true,piles,players);
     console.log('players in normal game creation', players);
     Db.createPlayersForGame(currentPlayer.table, players, newGameKey);
-    
+
     // write to the database
     // everything should be on the database from here on
     // push players up with:
