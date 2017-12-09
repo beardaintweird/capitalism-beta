@@ -406,9 +406,9 @@ var Game = (function(){
       // checks if the pile was empty before the last card was played
       if(this.playArea.length < 2) return;
       // gets the card below the topCard
-      let compCard = this.playArea[this.playArea.length - 2].card;
+      let comparisonCard = this.playArea[this.playArea.length - 2].card;
       // checks if the card played is the same rank as the card on top of the pile
-      return card.rank === compCard.rank;
+      return card.rank === comparisonCard.rank;
     },
     clearPlayArea(){
       console.log('pile cleared')

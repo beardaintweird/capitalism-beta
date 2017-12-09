@@ -19,26 +19,38 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = http.Server(app);
 
 /*
 ===============
 SOCKET.IO
 ===============
 */
-const io = require('socket.io')(server, {
+const socketio = require('socket.io')
+const io = (socketio)(server, {
   origin: '*:*'
 });
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-})
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 server.listen(port);
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  console.log('socket id', socket.id);
+  socket.on('subscribeToTimer',
+    (interval) => {
+      console.log('client is subscribing to timer with interval ', interval);
+      setInterval(() => {
+        socket.emit('timer', new Date());
+      }, interval);
+    }
+  );
+})
+
+
 server.on('error', onError);
 server.on('listening', onListening);
 

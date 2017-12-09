@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Players', {
+    return queryInterface.createTable('tables', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,17 +11,11 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      username: {
-        type: Sequelize.STRING
-      },
-      games_played: {
+      player_limit: {
         type: Sequelize.INTEGER
       },
-      points: {
-        type: Sequelize.INTEGER
-      },
-      table_id: {
-        type: Sequelize.INTEGER
+      players: {
+        type: Sequelize.ARRAY(Sequelize.STRING)
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +28,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Players');
+    return queryInterface.dropTable('tables');
   }
 };

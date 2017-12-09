@@ -4,13 +4,11 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     username: DataTypes.STRING,
     games_played: DataTypes.INTEGER,
-    points: DataTypes.INTEGER
-  }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
-    }
+    points: DataTypes.INTEGER,
+    table_id: DataTypes.INTEGER
   });
+  Player.associate = function(models){
+    Player.hasOne(models.table, {foreignKey: 'id'})
+  }
   return Player;
 };

@@ -1,23 +1,50 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import io from 'socket.io-client';
-let socket = io('http://localhost:3000')
+import SocketIoClient from 'socket.io-client';
+
+import GameBoard from './components/GameBoard';
+import Nav from './components/Nav';
+import TableMenu from './components/TableMenu';
+
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom';
+
 class App extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      timestamp: 'current time...'
+    }
+
+    this.socket = SocketIoClient('http://localhost:3000');
+    this.socket.on('connect', () => {
+      console.log('connected with server!');
+      this.socket.emit('subscribeToTimer', 1000);
+      this.socket.on('timer', timestamp=>this.setState({timestamp:timestamp}));
+    })
+  }
 
   componentDidMount(){
 
   }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to Caps</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <Router>
+          <div>
+            <Nav />
+            <Route exact path="/" component={TableMenu}/>
+            <Route path="/gameboard" component={GameBoard}/>
+          </div>
+        </Router>
+        <p>timer event: {this.state.timestamp}</p>
       </div>
     );
   }
