@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
- import './TableMenu.css';
+import './TableMenu.css';
 import TableForm from './TableForm';
 
 import Table from './Table';
 
+import firebase from 'firebase';
 import { withRouter } from 'react-router-dom';
 
 
@@ -38,7 +39,12 @@ import { withRouter } from 'react-router-dom';
         <div className="row">
           <div className="col s3"></div>
           <div className="col s6">
+          {
+            firebase.auth().currentUser ?
             <TableForm joinRoom={this.joinRoom} socket={this.props.socket} />
+            : ''
+          }
+
           </div>
           <div className="col s3"></div>
         </div>
@@ -49,7 +55,8 @@ import { withRouter } from 'react-router-dom';
               joinRoom={this.joinRoom}
               table_id={table.id}
               table_name={table.name}
-              players={table.Players} />)
+              players={table.Players}
+              enabled={firebase.auth().currentUser ? true : false} />)
           })}
         </div>
         <p>Tables here...</p>

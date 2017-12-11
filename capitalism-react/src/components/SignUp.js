@@ -18,6 +18,7 @@ import {withRouter} from 'react-router-dom';
      }
      this.handleChange = this.handleChange.bind(this);
      this.handleSubmit = this.handleSubmit.bind(this);
+     this.updateError = this.updateError.bind(this);
    }
    componentDidMount(){
 
@@ -26,6 +27,7 @@ import {withRouter} from 'react-router-dom';
      this.setState({ [e.target.id]:e.target.value })
    }
    handleSubmit(e){
+     let error = ''
      firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then((user) => {
         const options = {
@@ -39,19 +41,26 @@ import {withRouter} from 'react-router-dom';
             username: this.state.username,
             games_played: 0,
             points: 0,
-            table_id: null
+            table_id: null,
+            email: this.state.email
           })
         }
         fetch('http://localhost:3000/player', options)
         .then(res=>res.json())
         .then(result=> {
           console.log(result);
-          this.props.history.push('/');
+          localStorage.setItem('user', result)
         })
-        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).catch((err) => {
-          this.setState({error: err.message})
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+          this.props.history.push('/');
+        }).catch((err) => {
+          this.updateError(err.message)
         })
       })
+      e.preventDefault();
+   }
+   updateError(msg){
+     this.setState({error: msg})
    }
    render() {
      return (

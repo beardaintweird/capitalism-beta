@@ -44,7 +44,15 @@ import React, {Component} from 'react';
               }) : 'no players'
             }
             </ul>
-          <button onClick={this.handleClick}>Join</button>
+            {
+              this.props.enabled ?
+                <button onClick={this.handleClick} >Join</button>
+              :
+                <div>
+                  <p>Sign in to join a table</p>
+                </div>
+            }
+
           </div>
         </div>
        </div>
