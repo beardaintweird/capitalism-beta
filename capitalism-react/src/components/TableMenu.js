@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
  import './TableMenu.css';
-
+import TableForm from './TableForm';
 
  class TableMenu extends Component {
    constructor(props){
@@ -13,6 +13,7 @@ import React, {Component} from 'react';
    render() {
      return (
        <div>
+        <TableForm />
         <p>Tables here...</p>
        </div>
      )

@@ -33,6 +33,7 @@ router.post('/table', (req,res,next) => {
     "player_limit": 6
   }
   */
+  console.log(req.body);
   db.table.create(req.body)
     .then((table) => {
       res.json(table)
@@ -76,7 +77,7 @@ router.post('/table/addPlayer', (req,res,next) => {
       })
     })
     .then((player) => {
-      res.json(table)
+      if(player) res.json("shuccess")
     }).catch(err=>res.status(500).json(err))
 })
 // Get tables
