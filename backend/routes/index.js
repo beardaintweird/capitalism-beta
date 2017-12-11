@@ -54,7 +54,6 @@ router.post('/table/addPlayer', (req,res,next) => {
     attributes: ['id','name','players']
   })
     .then((table) => {
-      console.log(table);
       if(!table.players) table.players = [req.body.player]
       else               table.players.push(req.body.player)
       console.log('after push');
@@ -67,7 +66,6 @@ router.post('/table/addPlayer', (req,res,next) => {
       })
     })
     .then((table) => {
-      console.log(table);
       return db.Player.update({
         table_id: req.body.table_id
       }, {
@@ -79,6 +77,38 @@ router.post('/table/addPlayer', (req,res,next) => {
     .then((player) => {
       if(player) res.json("shuccess")
     }).catch(err=>res.status(500).json(err))
+})
+// leave table
+router.post('/table/leave', (req,res,next) => {
+  /*
+  {
+    player_id: 1234,
+    table_id: 123
+  }
+  */
+  db.Player.update({table_id: null}, {
+    where: {
+      "id":req.body.player_id
+    }
+  })
+  .then((res) => {
+    console.log(res);
+    return db.table.findById(req.body.table_id)
+  })
+  .then((table) => {
+    table.players = table.players.filter((player) => {
+      return player != req.body.username
+    })
+    return db.table.update({players: table.players},
+    {
+      where: {
+        id: table.id
+      }
+    })
+  })
+  .then((result) => {
+    res.json(result)
+  }).catch(err=>res.status(500).json(err))
 })
 // Get tables
 router.get('/table', (req,res,next) => {

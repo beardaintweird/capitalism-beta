@@ -48,6 +48,12 @@ io.on('connection', (socket) => {
       }, interval);
     }
   );
+  socket.on('joinRoom', (table_id) => {
+    socket.join(table_id)
+    io.to(table_id).emit('hello')
+  })
+  socket.on('hello', (table_id) => {
+  })
 })
 
 

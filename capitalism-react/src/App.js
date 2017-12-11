@@ -24,7 +24,9 @@ class App extends Component {
       console.log('connected with server!');
       this.socket.emit('subscribeToTimer', 1000);
       this.socket.on('timer', timestamp=>this.setState({timestamp:timestamp}));
+
     })
+    let socket = this.socket
   }
 
   componentDidMount(){
@@ -40,8 +42,8 @@ class App extends Component {
         <Router>
           <div>
             <Nav />
-            <Route exact path="/" component={TableMenu}/>
-            <Route path="/gameboard" component={GameBoard}/>
+            <Route exact path="/" render={socket => <TableMenu socket={this.socket} />}/>
+            <Route path="/gameboard/:table_id" component={GameBoard}/>
           </div>
         </Router>
         <p>timer event: {this.state.timestamp}</p>
