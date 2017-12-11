@@ -8,6 +8,7 @@ module.exports = {
       games_played: 0,
       points: 0,
       table_id: null,
+      email: 'samee@vt.edu',
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

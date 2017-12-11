@@ -36,7 +36,8 @@ import React, {Component} from 'react';
    render() {
      return (
        <nav>
-        <NavLink exact onClick={this.handleClick} to="/">Tables</NavLink>
+        <NavLink exact onClick={this.handleClick} to="/">Tables</NavLink>&nbsp;
+        <NavLink onClick={this.handleClick} to="/login">Login</NavLink>
        </nav>
      )
    }

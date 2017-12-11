@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     username: DataTypes.STRING,
     games_played: DataTypes.INTEGER,
+    email: DataTypes.STRING,
     points: DataTypes.INTEGER,
     table_id: DataTypes.INTEGER
   });

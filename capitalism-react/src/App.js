@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import SocketIoClient from 'socket.io-client';
+import firebase from './firebase';
 
 import GameBoard from './components/GameBoard';
 import Nav from './components/Nav';
+import SignIn from './components/SignIn';
 import TableMenu from './components/TableMenu';
 
 import {
   BrowserRouter as Router,
-  Route
+  Route,
+  withRouter
 } from 'react-router-dom';
 
 class App extends Component {
@@ -24,13 +27,13 @@ class App extends Component {
       console.log('connected with server!');
       this.socket.emit('subscribeToTimer', 1000);
       this.socket.on('timer', timestamp=>this.setState({timestamp:timestamp}));
-
     })
-    let socket = this.socket
+    let socket = this.socket;
+
   }
 
   componentDidMount(){
-
+    console.log(firebase.auth().currentUser);
   }
 
   render() {
@@ -44,6 +47,7 @@ class App extends Component {
             <Nav />
             <Route exact path="/" render={socket => <TableMenu socket={this.socket} />}/>
             <Route path="/gameboard/:table_id" component={GameBoard}/>
+            <Route path="/login" component={SignIn} />
           </div>
         </Router>
         <p>timer event: {this.state.timestamp}</p>
