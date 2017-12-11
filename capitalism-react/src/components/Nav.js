@@ -24,6 +24,7 @@ import React, {Component} from 'react';
    }
    logout(e){
      firebase.auth().signOut();
+     localStorage.removeItem('user');
    }
    leaveTable(){
      const options = {

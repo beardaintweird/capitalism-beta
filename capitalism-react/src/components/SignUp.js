@@ -3,6 +3,8 @@ import './SignUp.css';
 
 import firebase from './../firebase';
 
+import { createUser } from './../api';
+
 import {withRouter} from 'react-router-dom';
 
  class SignUp extends Component {
@@ -26,31 +28,12 @@ import {withRouter} from 'react-router-dom';
    handleChange(e){
      this.setState({ [e.target.id]:e.target.value })
    }
+
    handleSubmit(e){
      let error = ''
      firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then((user) => {
-        const options = {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: this.state.first_name + ' ' + this.state.last_name,
-            username: this.state.username,
-            games_played: 0,
-            points: 0,
-            table_id: null,
-            email: this.state.email
-          })
-        }
-        fetch('http://localhost:3000/player', options)
-        .then(res=>res.json())
-        .then(result=> {
-          console.log(result);
-          localStorage.setItem('user', result)
-        })
+        createUser(this.state.first_name, this.state.last_name, this.state.username, this.state.email);
         firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
           this.props.history.push('/');
         }).catch((err) => {

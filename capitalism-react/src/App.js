@@ -4,6 +4,8 @@ import './App.css';
 import SocketIoClient from 'socket.io-client';
 import firebase from './firebase';
 
+import { getUser } from './api';
+
 import GameBoard from './components/GameBoard';
 import Nav from './components/Nav';
 import SignIn from './components/SignIn';
@@ -34,7 +36,14 @@ class App extends Component {
   }
 
   componentDidMount(){
-    console.log(firebase.auth().currentUser);
+    firebase.auth().onAuthStateChanged(function(user) {
+      if(firebase.auth().currentUser){
+        let email = firebase.auth().currentUser.email;
+        getUser(email);
+      } else {
+        localStorage.removeItem('user');
+      }
+    })
   }
 
   render() {

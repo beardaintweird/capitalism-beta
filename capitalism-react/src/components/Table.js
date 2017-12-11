@@ -20,8 +20,8 @@ import React, {Component} from 'react';
        body: JSON.stringify(
          {
            table_id: this.props.table_id,
-           player: 'Beardaintweird',
-           player_id: 1
+           player: JSON.parse(localStorage.getItem('user')).username,
+           player_id: JSON.parse(localStorage.getItem('user')).id
          })
      }
      fetch('http://localhost:3000/table/addPlayer', options)

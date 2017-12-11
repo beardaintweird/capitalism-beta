@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
- import './SignIn.css';
+import './SignIn.css';
 
 import {withRouter} from 'react-router-dom';
+import { getUser } from './../api';
+import firebase from './../firebase';
 
- import firebase from './../firebase';
-
- class SignIn extends Component {
+class SignIn extends Component {
    constructor(props){
      super(props);
      this.state = {
@@ -17,16 +17,22 @@ import {withRouter} from 'react-router-dom';
      this.handleChange = this.handleChange.bind(this)
    }
    componentDidMount(){
-     if(firebase.auth().currentUser)  this.props.history.push('/')
+     if(localStorage.getItem('user')) {
+       this.props.history.push('/')
+     } else {
+       console.log(firebase.auth().currentUser);
+     }
    }
    handleSubmit(e){
      let errorMessage = ''
      firebase.auth().signInWithEmailAndPassword(this.state.email,this.state.password)
+      .then(() => {
+        this.props.history.push('/')
+      })
       .catch((err) => {
         errorMessage = err.message
       })
       this.setState({error:errorMessage})
-      if(firebase.auth().currentUser) this.props.history.push('/')
       e.preventDefault()
    }
    handleChange(e){

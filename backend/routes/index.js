@@ -6,7 +6,17 @@ const db      = require('../models');
 router.get('/', function(req, res, next) {
   res.send('express connected');
 });
-
+// get player
+router.get('/player/:email', (req,res,next) => {
+  db.Player.findAll({
+    where: {
+      email: req.params.email
+    }
+  })
+    .then((player) => {
+      res.json(player)
+    }).catch(err=>res.status(500).json(err))
+})
 // add player
 router.post('/player', (req,res,next) => {
   /*
