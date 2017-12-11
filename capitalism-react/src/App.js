@@ -7,6 +7,7 @@ import firebase from './firebase';
 import GameBoard from './components/GameBoard';
 import Nav from './components/Nav';
 import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 import TableMenu from './components/TableMenu';
 
 import {
@@ -48,6 +49,7 @@ class App extends Component {
             <Route exact path="/" render={socket => <TableMenu socket={this.socket} />}/>
             <Route path="/gameboard/:table_id" component={GameBoard}/>
             <Route path="/login" component={SignIn} />
+            <Route path="/signup" component={SignUp} />
           </div>
         </Router>
         <p>timer event: {this.state.timestamp}</p>
