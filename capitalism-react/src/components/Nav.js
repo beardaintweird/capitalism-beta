@@ -3,12 +3,15 @@ import React, {Component} from 'react';
 
  import { NavLink } from 'react-router-dom';
 
+ import firebase from './../firebase';
+
  class Nav extends Component {
    constructor(props){
      super(props);
      this.state = {}
      this.handleClick = this.handleClick.bind(this)
      this.leaveTable = this.leaveTable.bind(this)
+     this.logout = this.logout.bind(this)
    }
    componentDidMount(){
 
@@ -18,6 +21,9 @@ import React, {Component} from 'react';
      if(window.location.href.match(/gameboard/gim)){
 
      }
+   }
+   logout(e){
+     firebase.auth().signOut();
    }
    leaveTable(){
      const options = {
@@ -37,7 +43,11 @@ import React, {Component} from 'react';
      return (
        <nav>
         <NavLink exact onClick={this.handleClick} to="/">Tables</NavLink>&nbsp;
-        <NavLink onClick={this.handleClick} to="/login">Login</NavLink>
+        {firebase.auth().currentUser ?
+          <NavLink onClick={this.logout} to="/login">Logout</NavLink>
+          : <NavLink onClick={this.handleClick} to="/login">Login</NavLink>
+
+        }
        </nav>
      )
    }

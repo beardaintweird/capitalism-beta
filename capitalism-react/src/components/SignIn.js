@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
  import './SignIn.css';
 
+import {withRouter} from 'react-router-dom';
+
  import firebase from './../firebase';
 
  class SignIn extends Component {
@@ -15,14 +17,15 @@ import React, {Component} from 'react';
      this.handleChange = this.handleChange.bind(this)
    }
    componentDidMount(){
-
+     if(firebase.auth().currentUser)  this.props.history.push('/')
    }
    handleSubmit(e){
+     let errorMessage = ''
      firebase.auth().signInWithEmailAndPassword(this.state.email,this.state.password)
       .catch((err) => {
-        this.setState({error: err.message})
-        console.log(err.message);
+        errorMessage = err.message
       })
+      this.setState({error:errorMessage})
       if(firebase.auth().currentUser) this.props.history.push('/')
       e.preventDefault()
    }
@@ -65,6 +68,7 @@ import React, {Component} from 'react';
                      <label style={{float: 'right'}}>
                        <a className='pink-text' href='#!'><b>Forgot Password?</b></a>
                      </label>
+                     <p>{this.state.error}</p>
                    </div>
 
                    <br />
@@ -72,7 +76,6 @@ import React, {Component} from 'react';
                      <div className='row'>
                        <button type='submit' name='btn_login' className='col s12 btn btn-large waves-effect indigo'>Login</button>
                      </div>
-                     {this.state.error}
                    </center>
                  </form>
                </div>
@@ -89,4 +92,4 @@ import React, {Component} from 'react';
    }
  }
 
- export default SignIn
+ export default withRouter(SignIn)
