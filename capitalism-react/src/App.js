@@ -37,9 +37,8 @@ class App extends Component {
 
   componentDidMount(){
     firebase.auth().onAuthStateChanged(function(user) {
-      if(firebase.auth().currentUser){
-        let email = firebase.auth().currentUser.email;
-        getUser(email);
+      if(user){
+        getUser(user.email);
       } else {
         localStorage.removeItem('user');
       }
