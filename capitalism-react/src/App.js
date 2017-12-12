@@ -81,7 +81,6 @@ class App extends Component {
             <Route path="/signup" component={SignUp} />
           </div>
         </Router>
-        <p>timer event: {this.state.timestamp}</p>
       </div>
     );
   }

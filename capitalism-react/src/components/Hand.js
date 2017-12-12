@@ -34,11 +34,11 @@ import React, {Component} from 'react';
             isBomb={card.isBomb}
             suit={card.suit}
             imageSrc={this.state.images[card.image]}
+            isTurn={this.props.isTurn}
             />
          )
        })
      }
-     console.log(this.state.images);
      return (
        <div>
         {cards}

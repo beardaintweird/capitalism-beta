@@ -16,6 +16,7 @@ class GameBoard extends Component {
       playerNames: [],
       players: [],
       hand: [],
+      this_player: {},
       game_underway: false
     }
     this.startGame = this.startGame.bind(this);
@@ -32,14 +33,14 @@ class GameBoard extends Component {
       this.setState({playerNames: result.players})
     })
     this.props.socket.on('cards_dealt', (players) => {
-      console.log('cards dealt socket event', players);
+      // console.log('cards dealt socket event', players);
       this.setState({players: players}, () => {
         let this_player = this.state.players.filter((player) => {
           return player.username == localStorage.getItem('username')
         })[0];
         if(this_player){
-          console.log(this_player);
           this.setState({hand:this_player.hand})
+          this.setState({this_player: this_player})
         }
       })
     })
@@ -56,9 +57,6 @@ class GameBoard extends Component {
     if(this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
     }
-    if(this.state.hand.length){
-      console.log(this.state.hand);
-    }
     return (
       <div className="container">
         <div className="row">
@@ -67,7 +65,7 @@ class GameBoard extends Component {
           })}
         </div>
         <div className="row"><Pile /></div>
-        <div className="row"><Hand data={this.state.hand}/></div>
+        <div className="row"><Hand data={this.state.hand} isTurn={this.state.this_player.isTurn}/></div>
         <div className="row">
           {
             this.state.playerNames.length >= 4 && !this.state.game_underway ?

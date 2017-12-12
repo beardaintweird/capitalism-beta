@@ -5,15 +5,19 @@ import React, {Component} from 'react';
    constructor(props){
      super(props);
      this.state = {
-
+       playedCards: []
      }
    }
    componentDidMount(){
 
    }
    render() {
+     // for rendering all played cards
+     // let pile = this.state.playedCards.map((card) => {
+     //
+     // })
      return (
-       <div>images will go here </div>
+       <div></div>
       )
     }
  }
