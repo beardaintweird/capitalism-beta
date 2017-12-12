@@ -50,7 +50,8 @@ io.on('connection', (socket) => {
   );
   socket.on('joinRoom', (table_id) => {
     socket.join(table_id)
-    io.to(table_id).emit('hello')
+    
+    io.to(table_id).emit('dealing_cards')
   })
   socket.on('hello', (table_id) => {
   })

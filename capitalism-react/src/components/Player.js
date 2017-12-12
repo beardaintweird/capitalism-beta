@@ -11,7 +11,9 @@ import './Player.css';
    }
    render() {
      return (
-       <div>Player name</div>
+       <div className="col s3">
+        <p>{this.props.username}</p>
+       </div>
      )
    }
  }

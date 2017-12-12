@@ -132,6 +132,13 @@ router.get('/table', (req,res,next) => {
       res.json(tables)
     }).catch(err=>res.status(500).json(err))
 })
+// Get one table
+router.get('/table/:id', (req,res,next) => {
+  db.table.findById(req.params.id)
+  .then((table) => {
+    res.json(table)
+  }).catch(err=>res.status(500).json(err))
+})
 
 
 // Add points
