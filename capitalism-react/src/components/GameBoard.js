@@ -12,7 +12,8 @@ class GameBoard extends Component {
     // pile
     //
     this.state = {
-      table_id: null,
+      table_id: 'null',
+      playerNames: [],
       players: [],
       hand: [],
       game_underway: false
@@ -28,34 +29,48 @@ class GameBoard extends Component {
     .then(res=>res.json())
     .then((result) => {
       console.log(result);
-      this.setState({players: result.players})
+      this.setState({playerNames: result.players})
     })
     this.props.socket.on('cards_dealt', (players) => {
       console.log('cards dealt socket event', players);
-      this.setState({players: players})
+      this.setState({players: players}, () => {
+        let this_player = this.state.players.filter((player) => {
+          return player.username == localStorage.getItem('username')
+        })[0];
+        if(this_player){
+          console.log(this_player);
+          this.setState({hand:this_player.hand})
+        }
+      })
     })
   }
   componentDidUpdate(){
-    // console.log(this.state.players);
+
   }
   startGame(e){
-    this.props.socket.emit('startGame', this.state.players)
+    this.props.socket.emit('startGame', this.state.playerNames, this.state.table_id)
     this.setState({game_underway: true})
+
   }
   render() {
-
+    if(this.state.table_id !== 'null'){
+      this.props.joinRoom(this.state.table_id)
+    }
+    if(this.state.hand.length){
+      console.log(this.state.hand);
+    }
     return (
       <div className="container">
         <div className="row">
-          {this.state.players.map((playerName) => {
+          {this.state.playerNames.map((playerName) => {
             return (<Player key={playerName} username={playerName} />)
           })}
         </div>
         <div className="row"><Pile /></div>
-        <div className="row"><Hand /></div>
+        <div className="row"><Hand data={this.state.hand}/></div>
         <div className="row">
           {
-            this.state.players.length >= 4 && !this.state.game_underway ?
+            this.state.playerNames.length >= 4 && !this.state.game_underway ?
             <button onClick={this.startGame}>Start Game</button>
             : <button onClick={this.startGame} disabled>Start Game</button>
           }

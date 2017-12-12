@@ -17,7 +17,7 @@ class SignIn extends Component {
      this.handleChange = this.handleChange.bind(this)
    }
    componentDidMount(){
-     if(localStorage.getItem('user')) {
+     if(localStorage.getItem('id')) {
        this.props.history.push('/')
      } else {
        // console.log(firebase.auth().currentUser);

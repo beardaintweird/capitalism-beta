@@ -39,27 +39,19 @@ const io = (socketio)(server, {
 server.listen(port);
 
 io.on('connection', (socket) => {
-  let table_id = null;
   console.log('a user connected');
-  console.log('socket id', socket.id);
-  socket.on('subscribeToTimer',
-    (interval) => {
-      console.log('client is subscribing to timer with interval ', interval);
-      setInterval(() => {
-        socket.emit('timer', new Date());
-      }, interval);
-    }
-  );
-  socket.on('joinRoom', (table_id) => {
-    table_id = table_id;
+  socket.on('joinTable', (table_id) => {
     socket.join(table_id)
+    console.log('sockets joining room :D');
+    io.to(table_id).emit('hello')
   })
-  socket.on('startGame', (players) => {
+  socket.on('startGame', (players, table_id) => {
+    console.log('starting game');
     let deck = cards.makeDeck();
 
     players = players.map((player, index) => {
       let obj = {
-        name: player,
+        username: player,
         number: index,
         hand: [],
         isTurn: false,
@@ -68,11 +60,10 @@ io.on('connection', (socket) => {
       }
       return obj;
     })
+    console.log(players);
+    console.log(table_id);
     players = cards.dealRandomly(deck, players)
     io.to(table_id).emit('cards_dealt', players)
-  })
-
-  socket.on('hello', (table_id) => {
   })
 })
 

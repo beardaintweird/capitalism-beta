@@ -26,13 +26,11 @@ class App extends Component {
     }
 
     this.socket = SocketIoClient('http://localhost:3000');
-    this.socket.on('connect', () => {
+    this.socket.on('connect', (id) => {
       console.log('connected with server!');
-      this.socket.emit('subscribeToTimer', 1000);
-      this.socket.on('timer', timestamp=>this.setState({timestamp:timestamp}));
     })
     let socket = this.socket;
-
+    this.joinRoom = this.joinRoom.bind(this)
   }
 
   componentDidMount(){
@@ -47,6 +45,13 @@ class App extends Component {
       }
     })
   }
+  joinRoom(table_id){
+    console.log('joining table:', table_id);
+    this.socket.emit('joinTable', table_id)
+    this.socket.on('hello', () => {
+      console.log('hello to our room!!!')
+    })
+  }
 
   render() {
     return (
@@ -57,10 +62,21 @@ class App extends Component {
         <Router>
           <div>
             <Nav />
-            <Route exact path="/" render={socket => <TableMenu socket={this.socket} />}/>
+            <Route exact path="/"
+              render={(socket, joinRoom) =>{
+                return(
+                  <TableMenu socket={this.socket} joinRoom={this.joinRoom} />
+                )
+                }
+              }/>
             <Route path="/gameboard/:table_id"
-            render={
-              socket => <GameBoard socket={this.socket} />}/>
+              render={
+                (socket, joinRoom) => {
+                  return (
+                    <GameBoard socket={this.socket} joinRoom={this.joinRoom} />
+                  )
+              }
+            }/>
             <Route path="/login" component={SignIn} />
             <Route path="/signup" component={SignUp} />
           </div>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
  import './TableForm.css';
-
+ import { withRouter } from 'react-router-dom';
 
  class TableForm extends Component {
    constructor(props){
@@ -54,6 +54,7 @@ import React, {Component} from 'react';
       .then((result_two) => {
         console.log(result_two);
         this.props.joinRoom(this.state.table_id)
+        this.props.history.push(`/gameboard/${this.state.table_id}`)
       })
      e.preventDefault();
    }
@@ -71,4 +72,4 @@ import React, {Component} from 'react';
    }
  }
 
- export default TableForm
+ export default withRouter(TableForm)
