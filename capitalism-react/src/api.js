@@ -3,7 +3,9 @@ module.exports = {
     fetch(`http://localhost:3000/player/${email}`)
     .then(res=>res.json())
     .then((player) => {
-      localStorage.setItem('user', JSON.stringify(player[0]))
+      for(let key in player[0]){
+        localStorage.setItem(key, player[0][key]);
+      }
     })
   },
   createUser(first_name, last_name, username, email){
@@ -26,7 +28,22 @@ module.exports = {
     .then(res=>res.json())
     .then(result=> {
       console.log(result);
-      localStorage.setItem('user', result)
+      for(let key in result){
+        localStorage.setItem(key, result[key]);
+        console.log(key,result[key]);
+      }
+      // localStorage.setItem('user', result)
     })
+  },
+  objectKeys(){
+    return {
+      id:'id',
+      email: 'email',
+      games_played: 'games_played',
+      name: 'name',
+      points: 'points',
+      table_id: 'table_id',
+      username: 'username'
+    }
   }
 }

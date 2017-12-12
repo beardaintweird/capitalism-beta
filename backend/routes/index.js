@@ -96,6 +96,7 @@ router.post('/table/leave', (req,res,next) => {
     table_id: 123
   }
   */
+  console.log(req.body);
   db.Player.update({table_id: null}, {
     where: {
       "id":req.body.player_id

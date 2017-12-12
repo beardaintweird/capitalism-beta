@@ -44,8 +44,8 @@ import React, {Component} from 'react';
           },
           body: JSON.stringify({
             table_id: result.id,
-            player: JSON.parse(JSON.stringify(localStorage.getItem('user'))).username,
-            player_id: JSON.parse(JSON.stringify(localStorage.getItem('user'))).id
+            player: localStorage.getItem('username'),
+            player_id: localStorage.getItem('id')
           })
         }
         return fetch('http://localhost:3000/table/addPlayer', options)

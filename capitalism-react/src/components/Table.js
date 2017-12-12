@@ -4,7 +4,9 @@ import React, {Component} from 'react';
  class Table extends Component {
    constructor(props){
      super(props);
-     this.state = {}
+     this.state = {
+       // enabled: true
+     }
      this.handleClick = this.handleClick.bind(this);
    }
    componentDidMount(){
@@ -20,19 +22,28 @@ import React, {Component} from 'react';
        body: JSON.stringify(
          {
            table_id: this.props.table_id,
-           player: JSON.parse(localStorage.getItem('user')).username,
-           player_id: JSON.parse(localStorage.getItem('user')).id
+           player: localStorage.getItem('username'),
+           player_id: localStorage.getItem('id')
          })
      }
      fetch('http://localhost:3000/table/addPlayer', options)
       .then(res=>res.json())
       .then((result) => {
         console.log(result);
+        localStorage.setItem('table_id', this.props.table_id)
         this.props.joinRoom(this.props.table_id)
       })
      console.log('clicked join');
    }
+   shouldUserJoinTable(){
+     if(localStorage.getItem('id')){
+       return localStorage.getItem('table_id') == 'null' ? true : false
+     } else {
+       return false
+     }
+   }
    render() {
+     let enabled = this.shouldUserJoinTable()
      return (
        <div className="col s3">
         <div className="card white">
@@ -45,11 +56,10 @@ import React, {Component} from 'react';
             }
             </ul>
             {
-              this.props.enabled ?
+              enabled ?
                 <button onClick={this.handleClick} >Join</button>
               :
                 <div>
-                  <p>Sign in to join a table</p>
                 </div>
             }
 

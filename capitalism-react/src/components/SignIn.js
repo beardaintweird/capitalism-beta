@@ -20,7 +20,7 @@ class SignIn extends Component {
      if(localStorage.getItem('user')) {
        this.props.history.push('/')
      } else {
-       console.log(firebase.auth().currentUser);
+       // console.log(firebase.auth().currentUser);
      }
    }
    handleSubmit(e){

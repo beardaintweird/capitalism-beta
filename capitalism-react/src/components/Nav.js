@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
  import './Nav.css';
-
  import { NavLink } from 'react-router-dom';
 
  import firebase from './../firebase';
@@ -19,12 +18,11 @@ import React, {Component} from 'react';
    handleClick(e){
      // console.log(window.location.href.match(/gameboard/gim));
      if(window.location.href.match(/gameboard/gim)){
-
+       this.leaveTable();
      }
    }
    logout(e){
      firebase.auth().signOut();
-     localStorage.removeItem('user');
    }
    leaveTable(){
      const options = {
@@ -34,11 +32,16 @@ import React, {Component} from 'react';
          'Content-Type': 'application/json'
        },
        body: JSON.stringify({
-         player_id: 1,
-         table_id: null
+         player_id: localStorage.getItem('id'),
+         table_id: localStorage.getItem('table_id')
        })
      }
-     // fetch()
+     fetch('http://localhost:3000/table/leave', options)
+     .then(res=>res.json())
+     .then((result) => {
+       // returns [1] or [0]
+       localStorage.removeItem('table_id');
+     })
    }
    render() {
      return (

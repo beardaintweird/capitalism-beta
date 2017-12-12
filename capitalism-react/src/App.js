@@ -4,7 +4,7 @@ import './App.css';
 import SocketIoClient from 'socket.io-client';
 import firebase from './firebase';
 
-import { getUser } from './api';
+import { getUser, objectKeys } from './api';
 
 import GameBoard from './components/GameBoard';
 import Nav from './components/Nav';
@@ -40,7 +40,10 @@ class App extends Component {
       if(user){
         getUser(user.email);
       } else {
-        localStorage.removeItem('user');
+        let keys = objectKeys();
+        for(let key in keys){
+          localStorage.removeItem(key);
+        }
       }
     })
   }

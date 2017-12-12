@@ -25,7 +25,6 @@ import { withRouter } from 'react-router-dom';
      .then(res=>res.json())
      .then(result => {
        this.setState({ tables: result })
-       console.log(this.state.tables);
      })
    }
    joinRoom(table_id){
@@ -55,8 +54,7 @@ import { withRouter } from 'react-router-dom';
               joinRoom={this.joinRoom}
               table_id={table.id}
               table_name={table.name}
-              players={table.Players}
-              enabled={firebase.auth().currentUser ? true : false} />)
+              players={table.Players} />)
           })}
         </div>
         <p>Tables here...</p>
