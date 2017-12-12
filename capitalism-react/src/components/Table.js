@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
  import './Table.css';
 
+ import {withRouter} from 'react-router-dom';
+
  class Table extends Component {
    constructor(props){
      super(props);
@@ -8,6 +10,8 @@ import React, {Component} from 'react';
        // enabled: true
      }
      this.handleClick = this.handleClick.bind(this);
+     this.goToGameBoard = this.goToGameBoard.bind(this);
+     this.shouldUserJoinTable = this.shouldUserJoinTable.bind(this);
    }
    componentDidMount(){
 
@@ -42,6 +46,9 @@ import React, {Component} from 'react';
        return false
      }
    }
+   goToGameBoard(e){
+     this.props.history.push(`/gameboard/${this.props.table_id}`)
+   }
    render() {
      let enabled = this.shouldUserJoinTable()
      return (
@@ -62,6 +69,11 @@ import React, {Component} from 'react';
                 <div>
                 </div>
             }
+            {
+              this.props.table_id == localStorage.getItem('table_id') ?
+                  <button onClick={this.goToGameBoard}>Go</button>
+                  : <div></div>
+            }
 
           </div>
         </div>
@@ -70,4 +82,4 @@ import React, {Component} from 'react';
    }
  }
 
- export default Table
+ export default withRouter(Table)

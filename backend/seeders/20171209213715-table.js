@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('tables', [{
       name: 'test_table',
-      players: null,
+      players: ['Beardaintweird', 'whatbeard', 'schmittyisdabomb','trolololol'],
       player_limit: 6,
       createdAt: new Date(),
       updatedAt: new Date()
