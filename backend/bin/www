@@ -7,7 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
-
+const cards = require('./../cards');
+const db    = require('./../models');
 /**
  * Get port from environment and store in Express.
  */
@@ -38,6 +39,7 @@ const io = (socketio)(server, {
 server.listen(port);
 
 io.on('connection', (socket) => {
+  let table_id = null;
   console.log('a user connected');
   console.log('socket id', socket.id);
   socket.on('subscribeToTimer',
@@ -49,10 +51,27 @@ io.on('connection', (socket) => {
     }
   );
   socket.on('joinRoom', (table_id) => {
+    table_id = table_id;
     socket.join(table_id)
-    
-    io.to(table_id).emit('dealing_cards')
   })
+  socket.on('startGame', (players) => {
+    let deck = cards.makeDeck();
+
+    players = players.map((player, index) => {
+      let obj = {
+        name: player,
+        number: index,
+        hand: [],
+        isTurn: false,
+        isDone: false,
+        hasScummedOut: false
+      }
+      return obj;
+    })
+    players = cards.dealRandomly(deck, players)
+    io.to(table_id).emit('cards_dealt', players)
+  })
+
   socket.on('hello', (table_id) => {
   })
 })

@@ -24,12 +24,14 @@ var Game = (function(){
     deal(deck){
       let x = 0;
       let piles = [];
+      // make the piles
       for(let i = 0, x = this.numOfPlayers; i < x; i++){
         piles.push({
           light: false,
           cards: []
         });
       }
+      // hand each card out one by one
       for(let i = 0; i < 52; i++){
         if(x === this.numOfPlayers){
           x = 0;
@@ -37,18 +39,22 @@ var Game = (function(){
         piles[x].cards.push(deck[i]);
         x++;
       }
+      // label light or not
       for(let i = 0, x = piles.length; i < x; i++){
         if(piles[i].cards.length < (52 / this.numOfPlayers)){
           piles[i].light = true;
         }
       }
+      // done
       return piles;
     },
     assignHands(isFirstGame, piles, players){
       if(isFirstGame){
+        // assigning the hands
         for(let i = 0, x = this.numOfPlayers; i < x; i++){
           this.players[i].hand = piles[i];
         }
+        // whoever holds the 3 of clubs goes first!
         this.players.map((x)=>{
           return x.hand.cards.map((y)=>{
             if(y.title === 3 && y.suit === 'clubs'){

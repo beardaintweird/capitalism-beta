@@ -13,8 +13,12 @@ class GameBoard extends Component {
     //
     this.state = {
       table_id: null,
-      players: []
+      players: [],
+      hand: [],
+      game_underway: false
     }
+    this.startGame = this.startGame.bind(this);
+
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -26,8 +30,20 @@ class GameBoard extends Component {
       console.log(result);
       this.setState({players: result.players})
     })
+    this.props.socket.on('cards_dealt', (players) => {
+      console.log('cards dealt socket event', players);
+      this.setState({players: players})
+    })
+  }
+  componentDidUpdate(){
+    // console.log(this.state.players);
+  }
+  startGame(e){
+    this.props.socket.emit('startGame', this.state.players)
+    this.setState({game_underway: true})
   }
   render() {
+
     return (
       <div className="container">
         <div className="row">
@@ -37,6 +53,13 @@ class GameBoard extends Component {
         </div>
         <div className="row"><Pile /></div>
         <div className="row"><Hand /></div>
+        <div className="row">
+          {
+            this.state.players.length >= 4 && !this.state.game_underway ?
+            <button onClick={this.startGame}>Start Game</button>
+            : <button onClick={this.startGame} disabled>Start Game</button>
+          }
+        </div>
       </div>
     )
   }

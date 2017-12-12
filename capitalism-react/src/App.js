@@ -58,7 +58,9 @@ class App extends Component {
           <div>
             <Nav />
             <Route exact path="/" render={socket => <TableMenu socket={this.socket} />}/>
-            <Route path="/gameboard/:table_id" component={GameBoard}/>
+            <Route path="/gameboard/:table_id"
+            render={
+              socket => <GameBoard socket={this.socket} />}/>
             <Route path="/login" component={SignIn} />
             <Route path="/signup" component={SignUp} />
           </div>
