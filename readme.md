@@ -29,6 +29,7 @@ But that took most of my time. That + implementing both socket.io and react for 
 - Protect routes with JWTs
 - Store all moves in the database
 - Allow random game generation pooling free users together
+- Create an AI
 
 ## Bugs
 ### First run:
