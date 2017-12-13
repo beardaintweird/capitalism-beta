@@ -1,31 +1,54 @@
 # Capitalism - Be the rich
 
 ## Technologies used
-- javascript
-- Bootstrap
-- Jquery
+- MaterializeCSS
 - GitHub
-- Future: firebase
+- firebase (auth)
+- postgres
+- Express
+- node.js
+- React
+- socket.io
+
 
 ## Process
+### First run:
 My initial approach was to list the features I wanted quickly and jump directly into coding the first feature. Test that feature. Move on to the next one. Repeat.
 However, in a large project with complex logic like this one, failing to plan is failing to plan. Right when I set my eyes on the finish line the code gave out. Adding anything new involved reusing code and breaking pre-existing features. So I stopped. Breathed. And took my expo marker to the white board.
 I spent an entire day laying out the proper flow for my app. Then I refactored my existing code to fit the new plan. I repeated that process until my app functioned (almost) without any bugs.
 Proper planning is underrated and very useful.
+### Second run:
+This time I did things... pretty much the same. I ran into development without a lot of planning and foresight. However, my plan in general was clear: lay the foundation, then develop the user-facing features. So I made the models with their associations, the API, and authentication.
+But that took most of my time. That + implementing both socket.io and react for the first time led me to leave off a lot of styling and user features. The bugs and additional features list grew and sits at a couple dozen or more items. Sticking to the critical path proved very difficult and is a process I need to get better at.
 
 ## Future features
 - clear the game and play a new one
 - persist the rankings of the previous game in order to play the next one
 - allow one game to be played on multiple devices at the same damn time
+- Store user information in JWTs
+- Protect routes with JWTs
+- Store all moves in the database
+- Allow random game generation pooling free users together
 
 ## Bugs
+### First run:
 - skipping players doesn't work when players in-between them have finished (should be an easy fix)
+### Second run:
+- leaving gameboard doesn't remove from table
+- components don't refresh as the user would expect them to, leaving information that isn't updated
+- Login & Logout are a little wonky... not using just firebase or just localStorage.
 
 ## Biggest wins
+### First run:
 I love how I was able to properly design, implement, and understand a fully functioning game. I don't believe this game to be trivial either. I also managed myself well enough to stay on track and complete the most necessary features first.
+### Second run:
+Making a full-stack nearly production-ready app is very gratifying. Looking forward to bringing it to completion.
 
 ## Biggest challenges
+### First run:
 Writing spaghetti code. I need to learn how to not get in my own way by writing bad code.
+### Second run:
+Data flow in React. Didn't know where to store which pieces of information and how to navigate the branching nature of nested components.
 
 ## Capitalism
 - Players: 4-8
@@ -52,6 +75,7 @@ Writing spaghetti code. I need to learn how to not get in my own way by writing 
 ## Github Pages link
 
 ## Github repo link
+https://github.com/beardaintweird/capitalism
 
 ## Wireframes
 ![wireframe](./wireframes/wireframe1.jpg)
