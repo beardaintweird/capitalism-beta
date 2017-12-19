@@ -23,32 +23,36 @@ import React, {Component} from 'react';
    }
    render() {
      let cards;
+     let pass;
      if(this.props.data.cards){
        cards = this.props.data.cards.map((card) => {
-         if(card.image.substring(0,4) == 'img/'){
+         if(card.image.substring(0,4) === 'img/'){
            card.image = card.image.substring(4);
          }
          return (
            <Card
             key={card.title + card.suit}
+            data={card}
             title={card.title}
             rank={card.rank}
             isBomb={card.isBomb}
             suit={card.suit}
             imageSrc={this.state.images[card.image]}
             isTurn={this.props.isTurn}
+            playCard={this.props.playCard}
             />
          )
        })
+       if(this.props.isTurn){
+         pass = <button onClick={this.props.pass}>Pass</button>
+       } else {
+         pass = <button onClick={this.props.pass} disabled>Pass</button>
+       }
      }
      return (
        <div>
         {cards}<br/>
-        {
-          this.props.isTurn ?
-          (<button onClick={this.props.pass}>Pass</button>)
-          :(<button onClick={this.props.pass} disabled>Pass</button>)
-        }
+        {pass}
        </div>
      )
    }

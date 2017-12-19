@@ -10,17 +10,16 @@ import './Player.css';
 
    }
    render() {
-     if(this.props.isTurn) {
-       console.log(`it's ${this.props.username}'s turn`);
+     let name;
+     if(this.props.isTurn && this.props.username === localStorage.getItem('username')) {
+       console.log(`It's ${this.props.username}'s turn`);
+       name = (<p className="active">{this.props.username}</p>)
+     } else {
+       name = (<p className="inactive">{this.props.username}</p>)
      }
      return (
        <div className="col s3">
-       {
-         this.props.isTurn ?
-          (<p><strong>{this.props.username}</strong></p>)
-          : (<p>{this.props.username}</p>)
-       }
-
+        {name}
        </div>
      )
    }

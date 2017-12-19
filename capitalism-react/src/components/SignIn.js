@@ -36,7 +36,7 @@ class SignIn extends Component {
       e.preventDefault()
    }
    handleChange(e){
-     e.target.id == 'email' ? this.setState({email:e.target.value})
+     e.target.id === 'email' ? this.setState({email:e.target.value})
       : this.setState({password:e.target.value})
    }
    render() {

@@ -11,7 +11,8 @@ import React, {Component} from 'react';
 
    }
    handleClick(e){
-     console.log(`${this.props.title} ${this.props.rank}`);
+     console.log(`${this.props.title} of ${this.props.suit}.`);
+     this.props.playCard(this.props.data)
    }
    render() {
      return (
@@ -19,10 +20,10 @@ import React, {Component} from 'react';
        {
          this.props.isTurn ?
          (<button onClick={this.handleClick}>
-                   <img src={this.props.imageSrc} />
+                   <img src={this.props.imageSrc} alt='' />
                  </button>)
         :(<button onClick={this.handleClick} disabled>
-                  <img src={this.props.imageSrc} />
+                  <img src={this.props.imageSrc} alt='' />
                 </button>)
        }
 

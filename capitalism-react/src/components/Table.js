@@ -41,7 +41,7 @@ import React, {Component} from 'react';
    }
    shouldUserJoinTable(){
      if(localStorage.getItem('id')){
-       return localStorage.getItem('table_id') == 'null' ? true : false
+       return localStorage.getItem('table_id') === 'null' ? true : false
      } else {
        return false
      }
@@ -70,7 +70,7 @@ import React, {Component} from 'react';
                 </div>
             }
             {
-              this.props.table_id == localStorage.getItem('table_id') ?
+              this.props.table_id === localStorage.getItem('table_id') ?
                   <button onClick={this.goToGameBoard}>Go</button>
                   : <div></div>
             }
