@@ -25,7 +25,9 @@ import React, {Component} from 'react';
      let cards;
      if(this.props.data.cards){
        cards = this.props.data.cards.map((card) => {
-         card.image = card.image.substring(4);
+         if(card.image.substring(0,4) == 'img/'){
+           card.image = card.image.substring(4);
+         }
          return (
            <Card
             key={card.title + card.suit}
@@ -41,7 +43,12 @@ import React, {Component} from 'react';
      }
      return (
        <div>
-        {cards}
+        {cards}<br/>
+        {
+          this.props.isTurn ?
+          (<button onClick={this.props.pass}>Pass</button>)
+          :(<button onClick={this.props.pass} disabled>Pass</button>)
+        }
        </div>
      )
    }

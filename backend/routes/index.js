@@ -65,7 +65,15 @@ router.post('/table/addPlayer', (req,res,next) => {
   })
     .then((table) => {
       if(!table.players) table.players = [req.body.player]
-      else               table.players.push(req.body.player)
+      else {
+        let player_exists = false;
+        let matched_names = table.players.filter((playerName) => {
+          return req.body.player == playerName
+        })
+        player_exists = matched_names.length ? true : false;
+        if(player_exists) res.json('player already in table');
+        table.players.push(req.body.player)
+      }
       console.log('after push');
       return table.update({
         players: table.players

@@ -10,9 +10,17 @@ import './Player.css';
 
    }
    render() {
+     if(this.props.isTurn) {
+       console.log(`it's ${this.props.username}'s turn`);
+     }
      return (
        <div className="col s3">
-        <p>{this.props.username}</p>
+       {
+         this.props.isTurn ?
+          (<p><strong>{this.props.username}</strong></p>)
+          : (<p>{this.props.username}</p>)
+       }
+
        </div>
      )
    }

@@ -19,8 +19,9 @@ class GameBoard extends Component {
       this_player: {},
       game_underway: false
     }
-    this.startGame = this.startGame.bind(this);
-
+    this.startGame    = this.startGame.bind(this);
+    this.pass         = this.pass.bind(this);
+    this.updatePlayer = this.updatePlayer.bind(this);
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -34,24 +35,35 @@ class GameBoard extends Component {
     })
     this.props.socket.on('cards_dealt', (players) => {
       // console.log('cards dealt socket event', players);
-      this.setState({players: players}, () => {
-        let this_player = this.state.players.filter((player) => {
-          return player.username == localStorage.getItem('username')
-        })[0];
-        if(this_player){
-          this.setState({hand:this_player.hand})
-          this.setState({this_player: this_player})
-        }
-      })
+      this.updatePlayer(players)
+    })
+    this.props.socket.on('pass_complete', (this_player, players) => {
+      console.log('pass_complete received from server!');
+      console.log(`${this_player.username} ${this.state.this_player.username}`);
+      this.updatePlayer(players)
     })
   }
   componentDidUpdate(){
 
   }
+  updatePlayer(players){
+    this.setState({players: players}, () => {
+      let this_player = this.state.players.filter((player) => {
+        return player.username == localStorage.getItem('username')
+      })[0];
+      if(this_player){
+        this.setState({hand:this_player.hand})
+        this.setState({this_player: this_player})
+      }
+    })
+  }
   startGame(e){
     this.props.socket.emit('startGame', this.state.playerNames, this.state.table_id)
     this.setState({game_underway: true})
-
+  }
+  pass(e){
+    console.log(`${this.state.this_player.username} passes.`);
+    this.props.socket.emit('pass', this.state.this_player, this.state.players, this.state.this_player.username, this.state.table_id)
   }
   render() {
     if(this.state.table_id !== 'null'){
@@ -61,11 +73,21 @@ class GameBoard extends Component {
       <div className="container">
         <div className="row">
           {this.state.playerNames.map((playerName) => {
-            return (<Player key={playerName} username={playerName} />)
+            return
+            (<Player
+              key={playerName}
+              isTurn={this.state.this_player.isTurn}
+              username={playerName} />)
           })}
         </div>
         <div className="row"><Pile /></div>
-        <div className="row"><Hand data={this.state.hand} isTurn={this.state.this_player.isTurn}/></div>
+        <div className="row">
+          <Hand
+            data={this.state.hand}
+            isTurn={this.state.this_player.isTurn}
+            pass={this.pass}
+            />
+        </div>
         <div className="row">
           {
             this.state.playerNames.length >= 4 && !this.state.game_underway ?
