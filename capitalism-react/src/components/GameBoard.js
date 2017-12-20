@@ -26,6 +26,9 @@ class GameBoard extends Component {
     this.updatePlayer      = this.updatePlayer.bind(this);
     this.updatePlayedCards = this.updatePlayedCards.bind(this);
     this.bomb              = this.bomb.bind(this);
+    this.playDoubles       = this.playDoubles.bind(this);
+    this.playTriples       = this.playTriples.bind(this);
+    this.autoComplete      = this.autoComplete.bind(this);
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -91,6 +94,15 @@ class GameBoard extends Component {
   bomb(card){
     this.props.socket.emit('bomb', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id);
   }
+  playDoubles(cards){
+    this.props.socket.emit('play_doubles', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+  }
+  playTriples(cards){
+    this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+  }
+  autoComplete(cards){
+    this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+  }
   render() {
     let topCard;
     if(this.state.table_id !== 'null'){
@@ -124,6 +136,9 @@ class GameBoard extends Component {
             playCard={this.playCard}
             topCard={topCard}
             bomb={this.bomb}
+            playDoubles={this.playDoubles}
+            playTriples={this.playTriples}
+            autoComplete={this.autoComplete}
             />
         </div>
         <div className="row">

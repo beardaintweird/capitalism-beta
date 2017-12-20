@@ -91,7 +91,15 @@ io.on('connection', (socket) => {
     played_cards = [];
     io.to(table_id).emit('bomb_complete', players, played_cards)
   })
-
+  socket.on('play_doubles', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+    // enter logic for playing doubles
+  })
+  socket.on('play_triples', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+    // enter logic for playing triples
+  })
+  socket.on('auto_complete', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+    // enter logic for auto completions
+  })
 })
 // gameplay functions
 function shouldSkip(card, played_cards){

@@ -86,13 +86,14 @@ import React, {Component} from 'react';
     }
   }
   createDoublesTriplesAutos(){
+    // to manage duplicates
     let uniqueKeys = [];
     let doublesTriplesAutos = [];
     for(let i = 0, hand = this.props.data.cards; i < this.props.data.cards.length - 1; i++){
       if(hand[i].rank === 13) continue;
       if(hand[i+1] && hand[i+1].rank===hand[i].rank){
         //create double button
-        let double = (<Double key={`Double_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />);
+        let double = (<Double key={`Double_${hand[i].title}`} playDoubles={this.props.playDoubles} rank={hand[i].rank} title={hand[i].title} />);
         if(uniqueKeys.indexOf(`Double_${hand[i].title}`) !== -1){
           continue;
         }
@@ -101,7 +102,7 @@ import React, {Component} from 'react';
       }
       if(hand[i+2] && hand[i+2].rank===hand[i].rank){
         // create triple button
-        let triple = (<Triple key={`Triple_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />)
+        let triple = (<Triple key={`Triple_${hand[i].title}`} playTriples={this.props.playTriples} rank={hand[i].rank} title={hand[i].title} />)
         if(uniqueKeys.indexOf(`Triple_${hand[i].title}`) !== -1){
           continue;
         }
@@ -110,29 +111,10 @@ import React, {Component} from 'react';
       }
       if(hand[i+3] && hand[i+3].rank===hand[i].rank){
         // create auto-complete button
-        let auto = (<AutoComplete key={`AutoComplete_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />)
+        let auto = (<AutoComplete key={`AutoComplete_${hand[i].title}`} autoComplete={this.props.autoComplete} rank={hand[i].rank} title={hand[i].title} />)
         doublesTriplesAutos.push(auto);
       }
     }
-    // console.log(doublesTriplesAutos);
-    // doublesTriplesAutos.sort((a,b)=>{
-    //   console.log(a.props.rank - b.props.rank);
-    //   return a.props.rank - b.props.rank
-    // });
-    // console.log(doublesTriplesAutos);
-    // doublesTriplesAutos = doublesTriplesAutos
-    // .filter((special, index, arr) => {
-    //   let nextSpecial;
-    //   if(arr[index + 1]){
-    //     nextSpecial = arr[index + 1];
-    //     console.log(special, special.key);
-    //     console.log(nextSpecial,nextSpecial.key);
-    //     return special.key !== nextSpecial.key
-    //   } else {
-    //     return true
-    //   }
-    // })
-
     return doublesTriplesAutos;
   }
    componentDidMount(){
