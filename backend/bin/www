@@ -71,13 +71,18 @@ io.on('connection', (socket) => {
     console.log('at the end of pass', players);
     io.to(table_id).emit('pass_complete', players);
   })
-  socket.on('play_card', (players, card, username, table_id) => {
+  socket.on('play_card', (players, card, username, played_cards, table_id) => {
     let searchTerm = card.title + '' + card.suit;
+    // gets player's index
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    // gets card's index in the player's hand
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
-    players[playerIndex].hand.cards.splice(cardIndex,1);
+    let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+    console.log(played_card);
+    played_cards.push(played_card);
+    console.log(played_cards);
     changeTurns(players, playerIndex);
-    io.to(table_id).emit('play_card_complete', players);
+    io.to(table_id).emit('play_card_complete', players, played_cards);
   })
 
 })

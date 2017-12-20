@@ -16,13 +16,15 @@ class GameBoard extends Component {
       playerNames: [],
       players: [],
       hand: [],
+      played_cards: [],
       this_player: {},
       game_underway: false
     }
-    this.startGame    = this.startGame.bind(this);
-    this.pass         = this.pass.bind(this);
-    this.updatePlayer = this.updatePlayer.bind(this);
-    this.playCard     = this.playCard.bind(this);
+    this.pass              = this.pass.bind(this);
+    this.playCard          = this.playCard.bind(this);
+    this.startGame         = this.startGame.bind(this);
+    this.updatePlayer      = this.updatePlayer.bind(this);
+    this.updatePlayedCards = this.updatePlayedCards.bind(this);
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -42,13 +44,17 @@ class GameBoard extends Component {
       console.log('pass_complete received from server!');
       this.updatePlayer(players)
     })
-    this.props.socket.on('play_card_complete', (players) => {
-      console.log('play_card_complete received from server');
+    this.props.socket.on('play_card_complete', (players, played_cards) => {
+      console.log('play_card_complete received from server.');
       this.updatePlayer(players)
+      this.updatePlayedCards(played_cards);
     })
   }
   componentDidUpdate(){
 
+  }
+  updatePlayedCards(played_cards){
+    this.setState({played_cards})
   }
   updatePlayer(players){
     this.setState({players: players}, () => {
@@ -70,7 +76,7 @@ class GameBoard extends Component {
     this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.table_id)
   }
   playCard(card){
-    this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.table_id)
+    this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   render() {
     if(this.state.table_id !== 'null'){
@@ -90,7 +96,7 @@ class GameBoard extends Component {
         <div className="row">
           {players}
         </div>
-        <div className="row"><Pile /></div>
+        <div className="row"><Pile cards={this.state.played_cards} /></div>
         <div className="row">
           <Hand
             data={this.state.hand}
