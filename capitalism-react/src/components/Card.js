@@ -11,8 +11,12 @@ import React, {Component} from 'react';
 
    }
    handleClick(e){
-     console.log(`${this.props.title} of ${this.props.suit}.`);
-     this.props.playCard(this.props.data)
+     console.log(`${this.props.title} of ${this.props.suit}`);
+     if(this.props.isBomb){
+       this.props.bomb(this.props.data)
+     } else {
+       this.props.playCard(this.props.data)
+     }
    }
    render() {
      return (

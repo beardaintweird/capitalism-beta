@@ -105,6 +105,7 @@ import React, {Component} from 'react';
             imageSrc={this.state.images[card.image]}
             isTurn={this.props.isTurn}
             playCard={this.props.playCard}
+            bomb={this.props.bomb}
             enable={enable}
             />
          )

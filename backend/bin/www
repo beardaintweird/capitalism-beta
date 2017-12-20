@@ -64,11 +64,10 @@ io.on('connection', (socket) => {
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('pass', (players, username, table_id) => {
-    console.log('at the beginning of pass', players);
+    console.log('passing');
     let index = arrayObjectIndexOf(players, username, 'username');
     console.log('value returned by arrayObjectIndexOf:',index);
     changeTurns(players, index);
-    console.log('at the end of pass', players);
     io.to(table_id).emit('pass_complete', players);
   })
   socket.on('play_card', (players, card, username, played_cards, table_id) => {
@@ -81,6 +80,16 @@ io.on('connection', (socket) => {
     played_cards.push(played_card);
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     io.to(table_id).emit('play_card_complete', players, played_cards);
+  })
+  socket.on('bomb', (players, card, username, played_cards, table_id) => {
+    let searchTerm = card.title + '' + card.suit;
+    // gets player's index
+    let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    // gets card's index in the player's hand
+    let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
+    players[playerIndex].hand.cards.splice(cardIndex,1);
+    played_cards = [];
+    io.to(table_id).emit('bomb_complete', players, played_cards)
   })
 
 })

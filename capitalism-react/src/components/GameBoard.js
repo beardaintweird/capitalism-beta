@@ -25,6 +25,7 @@ class GameBoard extends Component {
     this.startGame         = this.startGame.bind(this);
     this.updatePlayer      = this.updatePlayer.bind(this);
     this.updatePlayedCards = this.updatePlayedCards.bind(this);
+    this.bomb              = this.bomb.bind(this);
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -52,6 +53,11 @@ class GameBoard extends Component {
     this.props.socket.on('skip', () => {
       console.log('SKIEP!!!');
       // add animation for skipping players here for hype
+    })
+    this.props.socket.on('bomb_complete', (players, played_cards) => {
+      console.log('bombs away!');
+      this.updatePlayer(players)
+      this.updatePlayedCards(played_cards)
     })
   }
   componentDidUpdate(){
@@ -81,6 +87,9 @@ class GameBoard extends Component {
   }
   playCard(card){
     this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+  }
+  bomb(card){
+    this.props.socket.emit('bomb', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id);
   }
   render() {
     let topCard;
@@ -114,6 +123,7 @@ class GameBoard extends Component {
             pass={this.pass}
             playCard={this.playCard}
             topCard={topCard}
+            bomb={this.bomb}
             />
         </div>
         <div className="row">
