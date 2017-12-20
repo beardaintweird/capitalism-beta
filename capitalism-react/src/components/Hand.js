@@ -2,6 +2,9 @@ import React, {Component} from 'react';
  import './Hand.css';
 
  import Card from './Card';
+ import Double from './Double';
+ import Triple from './Triple';
+ import AutoComplete from './AutoComplete';
 
  class Hand extends Component {
    constructor(props){
@@ -11,6 +14,7 @@ import React, {Component} from 'react';
      }
      this.importAll = this.importAll.bind(this)
      this.isLegalCardToPlay = this.isLegalCardToPlay.bind(this)
+     this.createDoublesTriplesAutos = this.createDoublesTriplesAutos.bind(this)
    }
 
     importAll(r) {
@@ -81,12 +85,63 @@ import React, {Component} from 'react';
       }
     }
   }
+  createDoublesTriplesAutos(){
+    let uniqueKeys = [];
+    let doublesTriplesAutos = [];
+    for(let i = 0, hand = this.props.data.cards; i < this.props.data.cards.length - 1; i++){
+      if(hand[i].rank === 13) continue;
+      if(hand[i+1] && hand[i+1].rank===hand[i].rank){
+        //create double button
+        let double = (<Double key={`Double_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />);
+        if(uniqueKeys.indexOf(`Double_${hand[i].title}`) !== -1){
+          continue;
+        }
+        uniqueKeys.push(`Double_${hand[i].title}`);
+        doublesTriplesAutos.push(double);
+      }
+      if(hand[i+2] && hand[i+2].rank===hand[i].rank){
+        // create triple button
+        let triple = (<Triple key={`Triple_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />)
+        if(uniqueKeys.indexOf(`Triple_${hand[i].title}`) !== -1){
+          continue;
+        }
+        uniqueKeys.push(`Triple_${hand[i].title}`);
+        doublesTriplesAutos.push(triple);
+      }
+      if(hand[i+3] && hand[i+3].rank===hand[i].rank){
+        // create auto-complete button
+        let auto = (<AutoComplete key={`AutoComplete_${hand[i].title}`} rank={hand[i].rank} title={hand[i].title} />)
+        doublesTriplesAutos.push(auto);
+      }
+    }
+    // console.log(doublesTriplesAutos);
+    // doublesTriplesAutos.sort((a,b)=>{
+    //   console.log(a.props.rank - b.props.rank);
+    //   return a.props.rank - b.props.rank
+    // });
+    // console.log(doublesTriplesAutos);
+    // doublesTriplesAutos = doublesTriplesAutos
+    // .filter((special, index, arr) => {
+    //   let nextSpecial;
+    //   if(arr[index + 1]){
+    //     nextSpecial = arr[index + 1];
+    //     console.log(special, special.key);
+    //     console.log(nextSpecial,nextSpecial.key);
+    //     return special.key !== nextSpecial.key
+    //   } else {
+    //     return true
+    //   }
+    // })
+
+    return doublesTriplesAutos;
+  }
    componentDidMount(){
      let images = this.importAll(require.context('./../../public/img', false, /\.(png|jpe?g|svg)$/));
      this.setState({images})
    }
    render() {
      let cards;
+     let specials;
      let pass;
      if(this.props.data.cards){
        cards = this.props.data.cards.map((card) => {
@@ -110,6 +165,7 @@ import React, {Component} from 'react';
             />
          )
        })
+       specials = this.createDoublesTriplesAutos();
        if(this.props.isTurn){
          pass = <button onClick={this.props.pass}>Pass</button>
        } else {
@@ -119,6 +175,7 @@ import React, {Component} from 'react';
      return (
        <div>
         {cards}<br/>
+        {specials}<br/>
         {pass}
        </div>
      )

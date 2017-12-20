@@ -42,7 +42,7 @@ class GameBoard extends Component {
       this.updatePlayer(players)
     })
     this.props.socket.on('pass_complete', (players) => {
-      console.log('pass_complete received from server!');
+      console.log('pass_complete received from server.');
       this.updatePlayer(players)
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
@@ -51,7 +51,7 @@ class GameBoard extends Component {
       this.updatePlayedCards(played_cards);
     })
     this.props.socket.on('skip', () => {
-      console.log('SKIEP!!!');
+      console.log('SKIEP!!');
       // add animation for skipping players here for hype
     })
     this.props.socket.on('bomb_complete', (players, played_cards) => {
