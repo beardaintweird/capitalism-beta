@@ -49,6 +49,10 @@ class GameBoard extends Component {
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards);
     })
+    this.props.socket.on('skip', () => {
+      console.log('SKIEP!!!');
+      // add animation for skipping players here for hype
+    })
   }
   componentDidUpdate(){
 

@@ -79,11 +79,33 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
     played_cards.push(played_card);
-    changeTurns(players, playerIndex);
+    changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     io.to(table_id).emit('play_card_complete', players, played_cards);
   })
 
 })
+// gameplay functions
+function shouldSkip(card, played_cards){
+  console.log('in should skip');
+  // include doubles and triples condition bc there's no skipping with doubles and triples
+  // checks if the pile was empty before the last card was played
+  if(played_cards.length < 2) return false;
+  // checks if the card played is the same rank as the card on top of the pile
+  return card.rank === played_cards[played_cards.length - 2].rank;
+}
+function changeTurns(players, index, shouldSkip, table_id){
+  players[index].isTurn = false;
+  index = index === players.length - 1 ? 0 : ++index;
+  while(players[index].isDone){
+    index = index === players.length - 1 ? 0 : ++index;
+  }
+  players[index].isTurn = true;
+  if(shouldSkip){
+    console.log('skipping player');
+    changeTurns(players, index, false, null);
+    io.to(table_id).emit('skip');
+  }
+}
 
 // helper functions
 function arrayObjectIndexOf(myArray, searchTerm, property) {
@@ -99,14 +121,7 @@ function arrayObjectIndexOfTwo(myArray, searchTerm, property1, property2) {
     }
     return -1;
 }
-function changeTurns(players, index){
-  players[index].isTurn = false;
-  index = index === players.length - 1 ? 0 : ++index;
-  while(players[index].isDone){
-    index = index === players.length - 1 ? 0 : ++index;
-  }
-  players[index].isTurn = true;
-}
+
 
 server.on('error', onError);
 server.on('listening', onListening);
