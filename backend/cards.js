@@ -99,6 +99,7 @@ module.exports = {
     let piles = this.makePiles(deck, players.length)
     // assigning the hands
     for(let i = 0, x = players.length; i < x; i++){
+      piles[i].cards.sort((a,b) => a.rank - b.rank);
       players[i].hand = piles[i];
     }
     // whoever holds the 3 of clubs goes first!
