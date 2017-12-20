@@ -18,7 +18,7 @@ import React, {Component} from 'react';
      return (
        <div className="card">
        {
-         this.props.isTurn ?
+         this.props.isTurn && this.props.enable ?
          (<button onClick={this.handleClick}>
                    <img src={this.props.imageSrc} alt='' />
                  </button>)

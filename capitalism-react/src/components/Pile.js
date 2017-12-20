@@ -22,9 +22,7 @@ import React, {Component} from 'react';
    }
    render() {
      let cards;
-     console.log(this.props.cards);
      if(this.props.cards.length){
-       console.log(this.props.cards);
        cards = this.props.cards.map((card) => {
          if(card.image.substring(0,4) === 'img/'){
            card.image = card.image.substring(4);

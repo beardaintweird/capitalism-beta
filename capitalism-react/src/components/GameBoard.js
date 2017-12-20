@@ -79,6 +79,7 @@ class GameBoard extends Component {
     this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   render() {
+    let topCard;
     if(this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
     }
@@ -90,6 +91,11 @@ class GameBoard extends Component {
                   isTurn={this.state.this_player.isTurn}
                   username={playerName} />)
       });
+    }
+    if(this.state.played_cards.length){
+      topCard = this.state.played_cards[this.state.played_cards.length - 1]
+    } else {
+      topCard = null;
     }
     return (
       <div className="container">
@@ -103,6 +109,7 @@ class GameBoard extends Component {
             isTurn={this.state.this_player.isTurn}
             pass={this.pass}
             playCard={this.playCard}
+            topCard={topCard}
             />
         </div>
         <div className="row">

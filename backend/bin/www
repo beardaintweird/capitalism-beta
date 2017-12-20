@@ -78,9 +78,7 @@ io.on('connection', (socket) => {
     // gets card's index in the player's hand
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
-    console.log(played_card);
     played_cards.push(played_card);
-    console.log(played_cards);
     changeTurns(players, playerIndex);
     io.to(table_id).emit('play_card_complete', players, played_cards);
   })
