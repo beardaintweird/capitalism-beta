@@ -18,7 +18,9 @@ class GameBoard extends Component {
       hand: [],
       played_cards: [],
       this_player: {},
-      game_underway: false
+      game_underway: false,
+      isDoublesOnly: false,
+      isTriplesOnly: false
     }
     this.pass              = this.pass.bind(this);
     this.playCard          = this.playCard.bind(this);
@@ -65,8 +67,33 @@ class GameBoard extends Component {
     this.props.socket.on('play_doubles_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
       console.log('doubles!');
+      this.setState({
+        isDoublesOnly: true
+      }, () => {
+        this.updatePlayer(players);
+        this.updatePlayedCards(played_cards);
+      })
+    })
+    this.props.socket.on('play_triples_complete', (players, played_cards) => {
+      // Making separate socket event in case of future animation or other functionality
+      console.log('triples!');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards);
+      this.setState({
+        isTriplesOnly: true
+      })
+    })
+    this.props.socket.on('play_auto_complete', (players, played_cards) => {
+      // Making separate socket event in case of future animation or other functionality
+      console.log('Auto complete!');
+      this.updatePlayer(players)
+      this.updatePlayedCards(played_cards);
+    })
+    this.props.socket.on('clear', () => {
+      this.setState({
+        isDoublesOnly: false,
+        isTriplesOnly: false
+      })
     })
   }
   componentDidUpdate(){
@@ -116,6 +143,7 @@ class GameBoard extends Component {
     if(cards.length > 3){
       cards = cards.splice(0,3);
     }
+    console.log('in play triples in gameboard');
     this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   autoComplete(title){
@@ -160,6 +188,8 @@ class GameBoard extends Component {
             playDoubles={this.playDoubles}
             playTriples={this.playTriples}
             autoComplete={this.autoComplete}
+            isDoublesOnly={this.state.isDoublesOnly}
+            isTriplesOnly={this.state.isTriplesOnly}
             />
         </div>
         <div className="row">

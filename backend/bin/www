@@ -90,6 +90,7 @@ io.on('connection', (socket) => {
     players[playerIndex].hand.cards.splice(cardIndex,1);
     played_cards = [];
     io.to(table_id).emit('bomb_complete', players, played_cards)
+    io.to(table_id).emit('clear')
   })
   socket.on('play_doubles', (players, cards, username, played_cards, table_id) => {
     // enter logic for playing doubles
@@ -108,6 +109,7 @@ io.on('connection', (socket) => {
   })
   socket.on('play_triples', (players, cards, username, played_cards, table_id) => {
     // enter logic for playing triples
+    console.log('playing triples');
     // gets player's index
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     for(let i = 0; i < 3; i++){

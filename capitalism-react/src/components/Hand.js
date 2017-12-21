@@ -22,7 +22,7 @@ import React, {Component} from 'react';
       r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
       return images;
     }
-  isLegalCardToPlay(rank){
+  isLegalCardToPlay(card){
     // ** COMING SOON **
     // disable all moves if the player has scummed out
     // if(turn.hasScummedOut){
@@ -32,7 +32,7 @@ import React, {Component} from 'react';
     // when the pile is empty
     if(!this.props.topCard){
       // And the card isn't a 2, enabled it. Otherwise, disable all bombs.
-      if(rank === 13){
+      if(card.rank === 13){
         return false;
       } else {
         return true;
@@ -40,46 +40,38 @@ import React, {Component} from 'react';
       // if the pile does have cards
     } else {
       // Bombs are always playable
-      if(rank === 13){
+      if(card.rank === 13){
         return true;
       }
       // check if the card has a higher rank
-      if(rank >= this.props.topCard.rank){
-        return true;
-        // ** COMING SOON **
-        // // if it's doubles only
-        // if(this.isDoublesOnly){
-        //   // enable the doubles
-        //   if(x.className.match(/double/gi)){
-        //     x.disabled = false;
-        //     return;
-        //     // disable the non-doubles
-        //   } else {
-        //     x.disabled = true;
-        //     return;
-        //   }
-        //   // if it's triples only
-        // } else if(this.isTriplesOnly) {
-        //   // enable the triples
-        //   if(x.className.match(/triple/gi)){
-        //     x.disabled = false;
-        //     return;
-        //     // disable the non-triples
-        //   } else {
-        //     x.disabled = true;
-        //     return;
-        //   }
-        //   // if it's a singles party, enable the singles and disable the doubles
-        // } else {
-        //   if(x.className.match(/double/gi) || x.className.match(/triple/gi)){
-        //     // console.log('for doubles and triples',x, topCard)
-        //     x.disabled = true;
-        //     return;
-        //   } else {
-        //     x.disabled = false;
-        //     return;
-        //   }
-        // }
+      if(card.rank >= this.props.topCard.rank){
+        console.log(`Is doubles? ${this.props.isDoublesOnly}`);
+        // if it's doubles only
+        if(this.props.isDoublesOnly){
+          // enable the doubles
+          if(card.type === 'double'){
+            return true;
+            // disable the non-doubles
+          } else {
+            return false;
+          }
+          // if it's triples only
+        } else if(this.props.isTriplesOnly) {
+          // enable the triples
+          if(card.type === 'triple'){
+            return true;
+            // disable the non-triples
+          } else {
+            return false;
+          }
+          // if it's a singles party, enable the singles and disable the doubles
+        } else {
+          if(card.type === 'double' || card.type === 'triple'){
+            return false;
+          } else {
+            return true;
+          }
+        }
       } else {
         return false;
       }
@@ -90,9 +82,14 @@ import React, {Component} from 'react';
     let uniqueKeys = [];
     let doublesTriplesAutos = [];
     for(let i = 0, hand = this.props.data.cards; i < this.props.data.cards.length - 1; i++){
-      let enabled = this.isLegalCardToPlay(hand[i].rank);
+      let enabled = false;
       if(hand[i].rank === 13) continue;
       if(hand[i+1] && hand[i+1].rank===hand[i].rank){
+        let card = {
+          rank: hand[i].rank,
+          type: 'double'
+        }
+        enabled = this.isLegalCardToPlay(card);
         //create double button
         let double = (<Double
           key={`Double_${hand[i].title}`}
@@ -108,6 +105,11 @@ import React, {Component} from 'react';
         doublesTriplesAutos.push(double);
       }
       if(hand[i+2] && hand[i+2].rank===hand[i].rank){
+        let card = {
+          rank: hand[i].rank,
+          type: 'triple'
+        }
+        enabled = this.isLegalCardToPlay(card);
         // create triple button
         let triple = (<Triple key={`Triple_${hand[i].title}`}
           playTriples={this.props.playTriples}
@@ -144,7 +146,7 @@ import React, {Component} from 'react';
      let pass;
      if(this.props.data.cards){
        cards = this.props.data.cards.map((card) => {
-         let enable = this.isLegalCardToPlay(card.rank);
+         let enable = this.isLegalCardToPlay(card);
          if(card.image.substring(0,4) === 'img/'){
            card.image = card.image.substring(4);
          }
