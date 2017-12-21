@@ -137,6 +137,20 @@ io.on('connection', (socket) => {
     io.to(table_id).emit('play_auto_complete', players, played_cards);
     io.to(table_id).emit('clear')
   })
+  socket.on('play_completion', (players, cards, username, played_cards, table_id) => {
+    // enter logic for completions
+    let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    for(let i = 0, len = cards.length; i < len; i++){
+      let searchTerm = cards[i].title + '' + cards[i].suit;
+      // gets card's index in the player's hand
+      let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
+      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_cards.push(played_card);
+    }
+    changeTurnsForCompletion(players, playerIndex);
+    io.to(table_id).emit('completion_complete', players)
+    io.to(table_id).emit('clear')
+  })
 })
 // gameplay functions
 function shouldSkip(card, played_cards){
@@ -159,6 +173,12 @@ function changeTurns(players, index, shouldSkip, table_id){
     changeTurns(players, index, false, null);
     io.to(table_id).emit('skip');
   }
+}
+function changeTurnsForCompletion(players, playerIndex){
+  players.map((player) => {
+    player.isTurn = player.username === players[playerIndex].username ?
+      true : false
+  })
 }
 
 // helper functions

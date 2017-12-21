@@ -31,6 +31,7 @@ class GameBoard extends Component {
     this.playTriples         = this.playTriples.bind(this);
     this.updatePlayer        = this.updatePlayer.bind(this);
     this.autoComplete        = this.autoComplete.bind(this);
+    this.playCompletion      = this.playCompletion.bind(this);
     this.updatePlayedCards   = this.updatePlayedCards.bind(this);
     this.checkForCompletions = this.checkForCompletions.bind(this);
 
@@ -87,6 +88,9 @@ class GameBoard extends Component {
       console.log('Auto complete!');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards);
+    })
+    this.props.socket.on('completion_complete', (players) => {
+      this.updatePlayer(players)
     })
     this.props.socket.on('clear', () => {
       this.setState({
@@ -148,7 +152,6 @@ class GameBoard extends Component {
     if(cards.length > 3){
       cards = cards.splice(0,3);
     }
-    console.log('in play triples in gameboard');
     this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   autoComplete(title){
@@ -156,6 +159,10 @@ class GameBoard extends Component {
       return card.title === title;
     });
     this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+  }
+  playCompletion(cards){
+    console.log('completion in gameboard');
+    this.props.socket.emit('play_completion', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   checkForCompletions(){
     if(!this.state.played_cards.length){
@@ -207,6 +214,7 @@ class GameBoard extends Component {
       completion = (<Completion
         title={completionArray[0].title}
         data={completionArray}
+        playCompletion={this.playCompletion}
         enabled={true}/>)
     } else {
       completion = (<Completion enabled={false} />)
