@@ -62,6 +62,12 @@ class GameBoard extends Component {
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards)
     })
+    this.props.socket.on('play_doubles_complete', (players, played_cards) => {
+      // Making separate socket event in case of future animation or other functionality
+      console.log('doubles!');
+      this.updatePlayer(players)
+      this.updatePlayedCards(played_cards);
+    })
   }
   componentDidUpdate(){
 
@@ -94,13 +100,28 @@ class GameBoard extends Component {
   bomb(card){
     this.props.socket.emit('bomb', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id);
   }
-  playDoubles(cards){
+  playDoubles(title){
+    let cards = this.state.hand.cards.filter((card) => {
+      return card.title === title;
+    });
+    if(cards.length > 2){
+      cards = cards.splice(0,2);
+    }
     this.props.socket.emit('play_doubles', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
-  playTriples(cards){
+  playTriples(title){
+    let cards = this.state.hand.cards.filter((card) => {
+      return card.title === title;
+    });
+    if(cards.length > 3){
+      cards = cards.splice(0,3);
+    }
     this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
-  autoComplete(cards){
+  autoComplete(title){
+    let cards = this.state.hand.cards.filter((card) => {
+      return card.title === title;
+    });
     this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   render() {

@@ -91,14 +91,48 @@ io.on('connection', (socket) => {
     played_cards = [];
     io.to(table_id).emit('bomb_complete', players, played_cards)
   })
-  socket.on('play_doubles', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+  socket.on('play_doubles', (players, cards, username, played_cards, table_id) => {
     // enter logic for playing doubles
+
+    // gets player's index
+    let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    for(let i = 0; i < 2; i++){
+      let searchTerm = cards[i].title + '' + cards[i].suit;
+      // gets card's index in the player's hand
+      let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
+      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_cards.push(played_card);
+    }
+    changeTurns(players, playerIndex, false, table_id);
+    io.to(table_id).emit('play_doubles_complete', players, played_cards);
   })
-  socket.on('play_triples', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+  socket.on('play_triples', (players, cards, username, played_cards, table_id) => {
     // enter logic for playing triples
+    // gets player's index
+    let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    for(let i = 0; i < 3; i++){
+      let searchTerm = cards[i].title + '' + cards[i].suit;
+      // gets card's index in the player's hand
+      let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
+      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_cards.push(played_card);
+    }
+    changeTurns(players, playerIndex, false, table_id);
+    io.to(table_id).emit('play_triples_complete', players, played_cards);
   })
-  socket.on('auto_complete', (this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id) => {
+  socket.on('auto_complete', (players, cards, username, played_cards, table_id) => {
     // enter logic for auto completions
+    // gets player's index
+    let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    for(let i = 0; i < 4; i++){
+      let searchTerm = cards[i].title + '' + cards[i].suit;
+      // gets card's index in the player's hand
+      let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
+      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_cards.push(played_card);
+    }
+    changeTurns(players, playerIndex, false, table_id);
+    io.to(table_id).emit('play_auto_complete', players, played_cards);
   })
 })
 // gameplay functions
