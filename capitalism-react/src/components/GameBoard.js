@@ -50,9 +50,9 @@ class GameBoard extends Component {
       // console.log('cards dealt socket event', players);
       this.updatePlayer(players)
     })
-    this.props.socket.on('pass_complete', (players) => {
-      console.log('pass_complete received from server.');
-      this.updatePlayer(players)
+    this.props.socket.on('pass_complete', (players, played_cards) => {
+      console.log('pass_complete received from server');
+      this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
       console.log('play_card_complete received from server.');
@@ -127,10 +127,11 @@ class GameBoard extends Component {
     this.setState({game_underway: true})
   }
   pass(e){
-    console.log(`${this.state.this_player.username} passes.`);
-    this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.table_id)
+    console.log(`${this.state.this_player.username} passes`);
+    this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   playCard(card){
+    card.username = this.state.this_player.username;
     this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   bomb(card){

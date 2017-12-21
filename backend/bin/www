@@ -63,12 +63,14 @@ io.on('connection', (socket) => {
     players = cards.dealRandomly(deck, players)
     io.to(table_id).emit('cards_dealt', players)
   })
-  socket.on('pass', (players, username, table_id) => {
-    console.log('passing');
+  socket.on('pass', (players, username, played_cards, table_id) => {
     let index = arrayObjectIndexOf(players, username, 'username');
-    console.log('value returned by arrayObjectIndexOf:',index);
     changeTurns(players, index);
-    io.to(table_id).emit('pass_complete', players);
+    index = index === players.length -1 ? 0 : ++index;
+    if(players[index].username === played_cards[played_cards.length - 1].username){
+      played_cards = []
+    }
+    io.to(table_id).emit('pass_complete', players, played_cards);
   })
   socket.on('play_card', (players, card, username, played_cards, table_id) => {
     let searchTerm = card.title + '' + card.suit;
