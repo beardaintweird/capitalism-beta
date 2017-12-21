@@ -45,7 +45,6 @@ import React, {Component} from 'react';
       }
       // check if the card has a higher rank
       if(card.rank >= this.props.topCard.rank){
-        console.log(`Is doubles? ${this.props.isDoublesOnly}`);
         // if it's doubles only
         if(this.props.isDoublesOnly){
           // enable the doubles
@@ -177,6 +176,7 @@ import React, {Component} from 'react';
        <div>
         {cards}<br/>
         {specials}<br/>
+        {this.props.completion}<br/>
         {pass}
        </div>
      )

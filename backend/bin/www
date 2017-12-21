@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     players[playerIndex].hand.cards.splice(cardIndex,1);
     played_cards = [];
-    io.to(table_id).emit('bomb_complete', players, played_cards)
+    io.to(table_id).emit('bomb_complete', players)
     io.to(table_id).emit('clear')
   })
   socket.on('play_doubles', (players, cards, username, played_cards, table_id) => {
@@ -135,6 +135,7 @@ io.on('connection', (socket) => {
     }
     changeTurns(players, playerIndex, false, table_id);
     io.to(table_id).emit('play_auto_complete', players, played_cards);
+    io.to(table_id).emit('clear')
   })
 })
 // gameplay functions

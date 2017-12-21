@@ -4,6 +4,7 @@ import './GameBoard.css';
 import Hand from './Hand';
 import Pile from './Pile';
 import Player from './Player';
+import Completion from './Completion';
 
 class GameBoard extends Component {
   constructor(props){
@@ -22,15 +23,17 @@ class GameBoard extends Component {
       isDoublesOnly: false,
       isTriplesOnly: false
     }
-    this.pass              = this.pass.bind(this);
-    this.playCard          = this.playCard.bind(this);
-    this.startGame         = this.startGame.bind(this);
-    this.updatePlayer      = this.updatePlayer.bind(this);
-    this.updatePlayedCards = this.updatePlayedCards.bind(this);
-    this.bomb              = this.bomb.bind(this);
-    this.playDoubles       = this.playDoubles.bind(this);
-    this.playTriples       = this.playTriples.bind(this);
-    this.autoComplete      = this.autoComplete.bind(this);
+    this.bomb                = this.bomb.bind(this);
+    this.pass                = this.pass.bind(this);
+    this.playCard            = this.playCard.bind(this);
+    this.startGame           = this.startGame.bind(this);
+    this.playDoubles         = this.playDoubles.bind(this);
+    this.playTriples         = this.playTriples.bind(this);
+    this.updatePlayer        = this.updatePlayer.bind(this);
+    this.autoComplete        = this.autoComplete.bind(this);
+    this.updatePlayedCards   = this.updatePlayedCards.bind(this);
+    this.checkForCompletions = this.checkForCompletions.bind(this);
+
   }
   componentDidMount(){
     let table_id = window.location.href.match(/d\/\d+$/)[0];
@@ -52,17 +55,15 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
       console.log('play_card_complete received from server.');
-      this.updatePlayer(players)
-      this.updatePlayedCards(played_cards);
+      this.updatePlayer(players,this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('skip', () => {
       console.log('SKIEP!!');
       // add animation for skipping players here for hype
     })
-    this.props.socket.on('bomb_complete', (players, played_cards) => {
+    this.props.socket.on('bomb_complete', (players) => {
       console.log('bombs away!');
       this.updatePlayer(players)
-      this.updatePlayedCards(played_cards)
     })
     this.props.socket.on('play_doubles_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
@@ -70,15 +71,13 @@ class GameBoard extends Component {
       this.setState({
         isDoublesOnly: true
       }, () => {
-        this.updatePlayer(players);
-        this.updatePlayedCards(played_cards);
-      })
+        this.updatePlayer(players,this.updatePlayedCards(played_cards))
+        })
     })
     this.props.socket.on('play_triples_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
       console.log('triples!');
-      this.updatePlayer(players)
-      this.updatePlayedCards(played_cards);
+      this.updatePlayer(players, this.updatePlayedCards(played_cards))
       this.setState({
         isTriplesOnly: true
       })
@@ -91,6 +90,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('clear', () => {
       this.setState({
+        played_cards: [],
         isDoublesOnly: false,
         isTriplesOnly: false
       })
@@ -100,9 +100,11 @@ class GameBoard extends Component {
 
   }
   updatePlayedCards(played_cards){
-    this.setState({played_cards})
+    this.setState({played_cards}, () => {
+      this.checkForCompletions();
+    })
   }
-  updatePlayer(players){
+  updatePlayer(players, callback){
     this.setState({players: players}, () => {
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
@@ -110,6 +112,9 @@ class GameBoard extends Component {
       if(this_player){
         this.setState({hand:this_player.hand})
         this.setState({this_player: this_player})
+      }
+      if(callback){
+        callback();
       }
     })
   }
@@ -152,6 +157,31 @@ class GameBoard extends Component {
     });
     this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
+  checkForCompletions(){
+    if(!this.state.played_cards.length){
+      return null;
+    }
+    let length = this.state.played_cards.length;
+    let topCard = this.state.played_cards[length - 1];
+    let potentialCompletion = [topCard]
+    let count = 2;
+    // gets the cards in the pile of the same rank
+    while(length - count >= 0
+    &&
+    topCard.rank === this.state.played_cards[length - count].rank){
+      potentialCompletion.push(this.state.played_cards[length - count]);
+      count++;
+    }
+    // check for completion in the user's hand
+    let userCompletion = this.state.hand.cards.filter((card) => {
+      return card.rank === potentialCompletion[0].rank
+    })
+    if(userCompletion.length + potentialCompletion.length === 4){
+      return userCompletion;
+    } else {
+      return null;
+    }
+  }
   render() {
     let topCard;
     if(this.state.table_id !== 'null'){
@@ -171,6 +201,17 @@ class GameBoard extends Component {
     } else {
       topCard = null;
     }
+    let completion;
+    if(this.checkForCompletions() !== null){
+      let completionArray = this.checkForCompletions()
+      completion = (<Completion
+        title={completionArray[0].title}
+        data={completionArray}
+        enabled={true}/>)
+    } else {
+      completion = (<Completion enabled={false} />)
+    }
+
     return (
       <div className="container">
         <div className="row">
@@ -190,6 +231,7 @@ class GameBoard extends Component {
             autoComplete={this.autoComplete}
             isDoublesOnly={this.state.isDoublesOnly}
             isTriplesOnly={this.state.isTriplesOnly}
+            completion={completion}
             />
         </div>
         <div className="row">
