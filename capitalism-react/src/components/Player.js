@@ -19,7 +19,8 @@ import './Player.css';
      }
      return (
        <div className="col s3">
-        {name}
+        {name}<br/>
+        <p>{this.props.ranking}</p>
        </div>
      )
    }

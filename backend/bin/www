@@ -52,6 +52,7 @@ io.on('connection', (socket) => {
     players = players.map((player, index) => {
       let obj = {
         username: player,
+        ranking: '',
         number: index,
         hand: [],
         isTurn: false,

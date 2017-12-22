@@ -51,7 +51,7 @@ class GameBoard extends Component {
       this.updatePlayer(players)
     })
     this.props.socket.on('pass_complete', (players, played_cards) => {
-      console.log('pass_complete received from server');
+      console.log('pass_complete received from server.');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
@@ -87,7 +87,7 @@ class GameBoard extends Component {
       // Making separate socket event in case of future animation or other functionality
       console.log('Auto complete!');
       this.updatePlayer(players)
-      this.updatePlayedCards(played_cards);
+      this.updatePlayedCards(played_cards, true);
     })
     this.props.socket.on('completion_complete', (players) => {
       this.updatePlayer(players)
@@ -103,9 +103,10 @@ class GameBoard extends Component {
   componentDidUpdate(){
 
   }
-  updatePlayedCards(played_cards){
+  updatePlayedCards(played_cards, autoComplete){
     this.setState({played_cards}, () => {
-      this.checkForCompletions();
+      if(!autoComplete)
+        this.checkForCompletions();
     })
   }
   updatePlayer(players, callback){
@@ -114,7 +115,12 @@ class GameBoard extends Component {
         return player.username === localStorage.getItem('username')
       })[0];
       if(this_player){
-        this.setState({hand:this_player.hand})
+        this.setState({hand:this_player.hand}, () => {
+          console.log(this.state.hand);
+          if(this.state.hand.length === 0){
+            console.log('Done!');
+          }
+        })
         this.setState({this_player: this_player})
       }
       if(callback){
@@ -201,7 +207,8 @@ class GameBoard extends Component {
         return (<Player
                   key={playerName}
                   isTurn={this.state.this_player.isTurn}
-                  username={playerName} />)
+                  username={playerName}
+                  ranking={this.state.this_player.ranking} />)
       });
     }
     if(this.state.played_cards.length){
