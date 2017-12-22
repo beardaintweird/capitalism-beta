@@ -47,21 +47,60 @@ io.on('connection', (socket) => {
   })
   socket.on('startGame', (players, table_id) => {
     console.log('starting game');
-    let deck = cards.makeDeck();
-
+    // let deck = cards.makeDeck();
+    //
     players = players.map((player, index) => {
       let obj = {
         username: player,
         ranking: '',
         number: index,
-        hand: [],
+        hand: {
+          cards:[]
+        },
         isTurn: false,
         isDone: false,
         hasScummedOut: false
       }
       return obj;
     })
-    players = cards.dealRandomly(deck, players)
+    let deck = [
+      {
+        title: 3,
+        rank: 3,
+        isBomb: false,
+        suit: 'spades',
+        image: './3_of_spades.png'
+      },
+      {
+        title: 3,
+        rank: 3,
+        isBomb: false,
+        suit: 'hearts',
+        image: './3_of_hearts.png'
+      },
+      {
+        title: 3,
+        rank: 3,
+        isBomb: false,
+        suit: 'diamonds',
+        image: './3_of_diamonds.png'
+      },
+      {
+        title: 3,
+        rank: 3,
+        isBomb: false,
+        suit: 'clubs',
+        image: './3_of_clubs.png'
+      }
+    ];
+    // players = cards.dealRandomly(deck, players)
+    console.log(players);
+    players = players.map((player, index) => {
+      if(deck[index].suit === 'clubs')
+        player.isTurn = true;
+      player.hand.cards.push(deck[index]);
+      return player;
+    })
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('pass', (players, username, played_cards, table_id) => {
@@ -81,8 +120,16 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
     played_cards.push(played_card);
+    if(players[playerIndex].hand.cards.length === 0){
+      players[playerIndex].isDone = true;
+      players = setRankings(players, playerIndex);
+    }
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     io.to(table_id).emit('play_card_complete', players, played_cards);
+    if(players.filter(player=>player.isDone).length === players.length){
+      io.to(table_id).emit('clear')
+      io.to(table_id).emit('game_finished')
+    }
   })
   socket.on('bomb', (players, card, username, played_cards, table_id) => {
     let searchTerm = card.title + '' + card.suit;
@@ -165,6 +212,12 @@ function shouldSkip(card, played_cards){
   return card.rank === played_cards[played_cards.length - 2].rank;
 }
 function changeTurns(players, index, shouldSkip, table_id){
+  let donePlayers = players.filter((player) => {
+    return player.isDone;
+  })
+  if(donePlayers.length === players.length){
+    return;
+  }
   players[index].isTurn = false;
   index = index === players.length - 1 ? 0 : ++index;
   while(players[index].isDone){
@@ -182,6 +235,30 @@ function changeTurnsForCompletion(players, playerIndex){
     player.isTurn = player.username === players[playerIndex].username ?
       true : false
   })
+}
+function setRankings(players, playerIndex){
+  let donePlayers = players.filter((player) => {
+    return player.isDone;
+  })
+  if(players.length === 4){
+    switch (donePlayers.length) {
+      case 1:
+        players[playerIndex].ranking = 'President'
+        break;
+      case 2:
+        players[playerIndex].ranking = 'Vice president'
+        break;
+      case 3:
+        players[playerIndex].ranking = 'Scum 1'
+        break;
+      case 4:
+        players[playerIndex].ranking = 'Scum 2'
+        break;
+      default:
+        players[playerIndex].ranking = ''
+    }
+  }
+  return players;
 }
 
 // helper functions

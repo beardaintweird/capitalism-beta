@@ -77,7 +77,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_triples_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('triples!');
+      console.log('triples!!');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
       this.setState({
         isTriplesOnly: true
@@ -92,6 +92,9 @@ class GameBoard extends Component {
     this.props.socket.on('completion_complete', (players) => {
       this.updatePlayer(players)
     })
+    this.props.socket.on('game_finished', () => {
+      console.log('Game finished!!');
+    })
     this.props.socket.on('clear', () => {
       this.setState({
         played_cards: [],
@@ -105,7 +108,7 @@ class GameBoard extends Component {
   }
   updatePlayedCards(played_cards, autoComplete){
     this.setState({played_cards}, () => {
-      if(!autoComplete)
+      if(!autoComplete && !this.state.this_player.isDone)
         this.checkForCompletions();
     })
   }
@@ -117,7 +120,7 @@ class GameBoard extends Component {
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
           console.log(this.state.hand);
-          if(this.state.hand.length === 0){
+          if(this.state.hand.cards.length === 0){
             console.log('Done!');
           }
         })
@@ -202,14 +205,22 @@ class GameBoard extends Component {
       this.props.joinRoom(this.state.table_id)
     }
     let players;
-    if(this.state.playerNames){
+    if(!this.state.players.length && this.state.playerNames){
       players = this.state.playerNames.map((playerName) => {
         return (<Player
                   key={playerName}
-                  isTurn={this.state.this_player.isTurn}
                   username={playerName}
-                  ranking={this.state.this_player.ranking} />)
+                  ranking={''} />)
       });
+    } else {
+      players = this.state.players.map((player) => {
+        return (<Player
+                  key={player.username}
+                  isTurn={player.isTurn}
+                  ranking={player.ranking}
+                  username={player.username}
+                  />)
+      })
     }
     if(this.state.played_cards.length){
       topCard = this.state.played_cards[this.state.played_cards.length - 1]
@@ -217,7 +228,7 @@ class GameBoard extends Component {
       topCard = null;
     }
     let completion;
-    if(this.checkForCompletions() !== null){
+    if(!this.state.this_player.isDone && this.checkForCompletions() !== null){
       let completionArray = this.checkForCompletions()
       completion = (<Completion
         title={completionArray[0].title}
