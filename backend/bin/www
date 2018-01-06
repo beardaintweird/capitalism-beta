@@ -120,10 +120,7 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
     played_cards.push(played_card);
-    if(players[playerIndex].hand.cards.length === 0){
-      players[playerIndex].isDone = true;
-      players = setRankings(players, playerIndex);
-    }
+    checkIfPlayerIsDone(players,playerIndex, played_card);
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     io.to(table_id).emit('play_card_complete', players, played_cards);
     if(players.filter(player=>player.isDone).length === players.length){
@@ -197,6 +194,7 @@ io.on('connection', (socket) => {
       let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
       played_cards.push(played_card);
     }
+    checkIfPlayerIsDone(players,playerIndex, null);
     changeTurnsForCompletion(players, playerIndex);
     io.to(table_id).emit('completion_complete', players)
     io.to(table_id).emit('clear')
@@ -236,29 +234,44 @@ function changeTurnsForCompletion(players, playerIndex){
       true : false
   })
 }
+function checkIfPlayerIsDone(players, playerIndex, played_card){
+  if(players[playerIndex].hand.cards.length === 0){
+    players[playerIndex].isDone = true;
+    if(played_card && played_card.rank===13){
+        // player scummed out
+        addScummedOutToRankings(players,playerIndex);
+    } else {
+      players = setRankings(players, playerIndex);
+    }
+  }
+}
 function setRankings(players, playerIndex){
   let donePlayers = players.filter((player) => {
     return player.isDone;
   })
-  if(players.length === 4){
-    switch (donePlayers.length) {
-      case 1:
-        players[playerIndex].ranking = 'President'
-        break;
-      case 2:
-        players[playerIndex].ranking = 'Vice president'
-        break;
-      case 3:
-        players[playerIndex].ranking = 'Scum 1'
-        break;
-      case 4:
+  // 4 players ranking system
+  if(donePlayers.length === 1){
+    players[playerIndex].ranking = 'President'
+  } else {
+    if(donePlayers.filter(player=>player.ranking==='Vice president').length){
+      if(donePlayers.filter(player=>player.ranking==='Scum 1').length){
         players[playerIndex].ranking = 'Scum 2'
-        break;
-      default:
-        players[playerIndex].ranking = ''
+      } else {
+        players[playerIndex].ranking = 'Scum 1'
+      }
+    } else {
+      players[playerIndex].ranking = 'Vice president'
     }
   }
   return players;
+}
+function addScummedOutToRankings(players, playerIndex){
+  // make scum 1 if there is already a scum 2
+  if(players.filter(player=>player.ranking === 'Scum 2').length){
+    players[playerIndex].ranking = 'Scum 1'
+  } else {
+    players[playerIndex].ranking = 'Scum 2'
+  }
 }
 
 // helper functions

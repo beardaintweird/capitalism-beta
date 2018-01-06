@@ -85,7 +85,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_auto_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('Auto complete!');
+      console.log('Auto complete! ');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards, true);
     })
