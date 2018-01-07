@@ -14,9 +14,9 @@ class GameBoard extends Component {
     //
     this.state = {
       table_id: 'null',
-      playerNames: [],
-      players: [],
       hand: [],
+      players: [],
+      playerNames: [],
       played_cards: [],
       this_player: {},
       game_underway: false,
@@ -47,7 +47,6 @@ class GameBoard extends Component {
       this.setState({playerNames: result.players})
     })
     this.props.socket.on('cards_dealt', (players) => {
-      // console.log('cards dealt socket event', players);
       this.updatePlayer(players)
     })
     this.props.socket.on('pass_complete', (players, played_cards) => {
@@ -93,6 +92,7 @@ class GameBoard extends Component {
       this.updatePlayer(players)
     })
     this.props.socket.on('game_finished', () => {
+      this.setState({game_underway: false})
       console.log('Game finished!!');
     })
     this.props.socket.on('clear', () => {
@@ -113,13 +113,13 @@ class GameBoard extends Component {
     })
   }
   updatePlayer(players, callback){
+    console.log(players);
     this.setState({players: players}, () => {
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
       })[0];
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
-          console.log(this.state.hand);
           if(this.state.hand.cards.length === 0){
             console.log('Done!');
           }
@@ -132,11 +132,12 @@ class GameBoard extends Component {
     })
   }
   startGame(e){
-    this.props.socket.emit('startGame', this.state.playerNames, this.state.table_id)
+    let players = this.state.players.length ? this.state.players : this.state.playerNames
+    this.props.socket.emit('startGame', players, this.state.table_id)
     this.setState({game_underway: true})
   }
   pass(e){
-    console.log(`${this.state.this_player.username} passes`);
+    console.log(`${this.state.this_player.username} passes `);
     this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   playCard(card){
@@ -171,7 +172,6 @@ class GameBoard extends Component {
     this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   playCompletion(cards){
-    console.log('completion in gameboard');
     this.props.socket.emit('play_completion', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
   }
   checkForCompletions(){
@@ -201,10 +201,12 @@ class GameBoard extends Component {
   }
   render() {
     let topCard;
+    let players;
+    let startGameButton;
+
     if(this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
     }
-    let players;
     if(!this.state.players.length && this.state.playerNames){
       players = this.state.playerNames.map((playerName) => {
         return (<Player
@@ -214,9 +216,11 @@ class GameBoard extends Component {
       });
     } else {
       players = this.state.players.map((player) => {
+        let prevRanking = player.previousRanking ? player.previousRanking : '';
         return (<Player
                   key={player.username}
                   isTurn={player.isTurn}
+                  previousRanking={prevRanking}
                   ranking={player.ranking}
                   username={player.username}
                   />)
@@ -237,6 +241,9 @@ class GameBoard extends Component {
         enabled={true}/>)
     } else {
       completion = (<Completion enabled={false} />)
+    }
+    if(this.state.playerNames.length >= 4 && !this.state.game_underway){
+      startGameButton = (<button onClick={this.startGame}>Start Game</button>)
     }
 
     return (
@@ -263,9 +270,7 @@ class GameBoard extends Component {
         </div>
         <div className="row">
           {
-            this.state.playerNames.length >= 4 && !this.state.game_underway ?
-            <button onClick={this.startGame}>Start Game</button>
-            : <button onClick={this.startGame} disabled>Start Game</button>
+            startGameButton
           }
         </div>
       </div>

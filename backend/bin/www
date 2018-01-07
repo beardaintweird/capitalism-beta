@@ -49,20 +49,35 @@ io.on('connection', (socket) => {
     console.log('starting game');
     // let deck = cards.makeDeck();
     //
-    players = players.map((player, index) => {
-      let obj = {
-        username: player,
-        ranking: '',
-        number: index,
-        hand: {
-          cards:[]
-        },
-        isTurn: false,
-        isDone: false,
-        hasScummedOut: false
-      }
-      return obj;
-    })
+    if(players[0].ranking){
+      // consecutive games
+      players = players.map(player=>{
+        player.isTurn = false;
+        player.isDone = false;
+        player.hand.cards = [];
+        player.previousRanking = player.ranking;
+        player.ranking = '';
+        return player;
+      })
+    } else {
+      // first game
+      players = players.map((player, index) => {
+        let obj = {
+          username: player,
+          previousRanking: '',
+          ranking: '',
+          number: index,
+          hand: {
+            cards:[]
+          },
+          isTurn: false,
+          isDone: false,
+          hasScummedOut: false
+        }
+        return obj;
+      })
+    }
+
     let deck = [
       {
         title: 3,
@@ -94,20 +109,28 @@ io.on('connection', (socket) => {
       }
     ];
     // players = cards.dealRandomly(deck, players)
-    console.log(players);
-    players = players.map((player, index) => {
-      if(deck[index].suit === 'clubs')
-        player.isTurn = true;
-      player.hand.cards.push(deck[index]);
-      return player;
-    })
+    if(players[0].ranking){
+      players = players.map((player,index)=> {
+        player.isTurn = player.ranking === 'President' ? true : false
+        player.hand.cards.push(deck[index])
+        return player;
+      })
+    } else {
+      players = players.map((player, index) => {
+        if(deck[index].suit === 'clubs')
+          player.isTurn = true;
+        player.hand.cards.push(deck[index]);
+        return player;
+      })
+    }
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('pass', (players, username, played_cards, table_id) => {
     let index = arrayObjectIndexOf(players, username, 'username');
     changeTurns(players, index);
     index = index === players.length -1 ? 0 : ++index;
-    if(players[index].username === played_cards[played_cards.length - 1].username){
+    if(played_cards.length > 1
+        && players[index].username === played_cards[played_cards.length - 1].username){
       played_cards = []
     }
     io.to(table_id).emit('pass_complete', players, played_cards);

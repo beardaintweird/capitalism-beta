@@ -21,6 +21,7 @@ class Player extends Component {
      <div className="col s3">
       {name}<br/>
       {this.props.ranking}
+      <p className="prev_ranking">{this.props.previousRanking}</p>
      </div>
    )
  }
