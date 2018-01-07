@@ -47,8 +47,7 @@ io.on('connection', (socket) => {
   })
   socket.on('startGame', (players, table_id) => {
     console.log('starting game');
-    // let deck = cards.makeDeck();
-    //
+    let deck = cards.makeDeck();
     if(players[0].ranking){
       // consecutive games
       players = players.map(player=>{
@@ -77,49 +76,11 @@ io.on('connection', (socket) => {
         return obj;
       })
     }
-
-    let deck = [
-      {
-        title: 3,
-        rank: 3,
-        isBomb: false,
-        suit: 'spades',
-        image: './3_of_spades.png'
-      },
-      {
-        title: 3,
-        rank: 3,
-        isBomb: false,
-        suit: 'hearts',
-        image: './3_of_hearts.png'
-      },
-      {
-        title: 3,
-        rank: 3,
-        isBomb: false,
-        suit: 'diamonds',
-        image: './3_of_diamonds.png'
-      },
-      {
-        title: 3,
-        rank: 3,
-        isBomb: false,
-        suit: 'clubs',
-        image: './3_of_clubs.png'
-      }
-    ];
-    // players = cards.dealRandomly(deck, players)
+    players = cards.dealRandomly(deck, players)
     if(players[0].ranking){
       players = players.map((player,index)=> {
         player.isTurn = player.ranking === 'President' ? true : false
         player.hand.cards.push(deck[index])
-        return player;
-      })
-    } else {
-      players = players.map((player, index) => {
-        if(deck[index].suit === 'clubs')
-          player.isTurn = true;
-        player.hand.cards.push(deck[index]);
         return player;
       })
     }
@@ -157,8 +118,9 @@ io.on('connection', (socket) => {
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     // gets card's index in the player's hand
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
-    players[playerIndex].hand.cards.splice(cardIndex,1);
+    let played_card = players[playerIndex].hand.cards.splice(cardIndex,1);
     played_cards = [];
+    checkIfPlayerIsDone(players, playerIndex, played_card);
     io.to(table_id).emit('bomb_complete', players)
     io.to(table_id).emit('clear')
   })
@@ -167,13 +129,17 @@ io.on('connection', (socket) => {
 
     // gets player's index
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    console.log('played cards', played_cards, 'hand', players[playerIndex].hand.cards);
+    let played_card;
     for(let i = 0; i < 2; i++){
       let searchTerm = cards[i].title + '' + cards[i].suit;
       // gets card's index in the player's hand
       let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
-      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
       played_cards.push(played_card);
     }
+    console.log('played cards', played_cards, 'hand', players[playerIndex].hand.cards);
+    checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
     io.to(table_id).emit('play_doubles_complete', players, played_cards);
   })
@@ -182,13 +148,15 @@ io.on('connection', (socket) => {
     console.log('playing triples');
     // gets player's index
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    let played_card;
     for(let i = 0; i < 3; i++){
       let searchTerm = cards[i].title + '' + cards[i].suit;
       // gets card's index in the player's hand
       let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
-      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
       played_cards.push(played_card);
     }
+    checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
     io.to(table_id).emit('play_triples_complete', players, played_cards);
   })
@@ -196,13 +164,15 @@ io.on('connection', (socket) => {
     // enter logic for auto completions
     // gets player's index
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
+    let played_card;
     for(let i = 0; i < 4; i++){
       let searchTerm = cards[i].title + '' + cards[i].suit;
       // gets card's index in the player's hand
       let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
-      let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
+      played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
       played_cards.push(played_card);
     }
+    checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
     io.to(table_id).emit('play_auto_complete', players, played_cards);
     io.to(table_id).emit('clear')
@@ -285,6 +255,11 @@ function setRankings(players, playerIndex){
     } else {
       players[playerIndex].ranking = 'Vice president'
     }
+  }
+  if(donePlayers.length === players.length - 1){
+    let lastPlayer = players.filter(player=>!player.isDone)
+    let playerIndex = arrayObjectIndexOf(players, lastPlayer.username, 'username');
+    return setRankings(players, playerIndex)
   }
   return players;
 }
