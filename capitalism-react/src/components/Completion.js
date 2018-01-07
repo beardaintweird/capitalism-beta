@@ -11,7 +11,7 @@ class Completion extends Component {
 
  }
  handleClick(){
-   console.log('handling completion click.');
+   console.log('handling completion click. ');
    this.props.playCompletion(this.props.data)
  }
  render() {
