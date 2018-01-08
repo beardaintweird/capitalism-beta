@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
     TODO: REFACTOR THIS FOR SEAMLESS CONTINUANCE OF GAMES
     */
     console.log('starting game');
-    let deck = cards.makeDeck();
+    // let deck = cards.makeDeck();
     if(players[0].ranking){
       // consecutive games
       players = players.map(player=>{
@@ -84,7 +84,7 @@ io.on('connection', (socket) => {
         return obj;
       })
     }
-    players = cards.dealRandomly(deck, players)
+    // players = cards.dealRandomly(deck, players)
     if(players[0].ranking){
       players = players.map((player,index)=> {
         player.isTurn = player.ranking === 'President' ? true : false
@@ -92,6 +92,42 @@ io.on('connection', (socket) => {
         return player;
       })
     }
+    let deck = [
+       {
+         title: 3,
+         rank: 3,
+         isBomb: false,
+         suit: 'spades',
+         image: './3_of_spades.png'
+       },
+       {
+         title: 3,
+         rank: 3,
+         isBomb: false,
+         suit: 'hearts',
+         image: './3_of_hearts.png'
+       },
+       {
+         title: 3,
+         rank: 3,
+         isBomb: false,
+         suit: 'diamonds',
+         image: './3_of_diamonds.png'
+       },
+       {
+         title: 3,
+         rank: 3,
+         isBomb: false,
+         suit: 'clubs',
+         image: './3_of_clubs.png'
+       }
+     ];
+     players = players.map((player, index) => {
+       if(deck[index].suit === 'clubs')
+         player.isTurn = true;
+       player.hand.cards.push(deck[index]);
+       return player;
+     })
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('start_next_game', (players, table_id) => {
@@ -274,7 +310,14 @@ function setRankings(players, playerIndex){
   } else {
     if(donePlayers.filter(player=>player.ranking==='Vice president').length){
       if(donePlayers.filter(player=>player.ranking==='Scum 1').length){
-        players[playerIndex].ranking = 'Scum 2'
+        players = players.map(player=>{
+          if(!player.ranking){
+            player.ranking = 'Scum 2'
+            player.isDone = true;
+            player.hand.cards = [];
+          }
+          return player
+        })
       } else {
         players[playerIndex].ranking = 'Scum 1'
       }

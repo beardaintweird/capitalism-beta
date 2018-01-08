@@ -66,7 +66,7 @@ class GameBoard extends Component {
     ==================================================
     */
     this.props.socket.on('pass_complete', (players, played_cards) => {
-      console.log('pass_complete received from server.');
+      console.log('pass_complete received from server. ');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
