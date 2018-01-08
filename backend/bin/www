@@ -45,7 +45,15 @@ io.on('connection', (socket) => {
     console.log('sockets joining room :D');
     io.to(table_id).emit('hello')
   })
+  /*
+  ==================================================
+  GAME ADMINISTRATION FUNCTIONALITY
+  ==================================================
+  */
   socket.on('startGame', (players, table_id) => {
+    /*
+    TODO: REFACTOR THIS FOR SEAMLESS CONTINUANCE OF GAMES
+    */
     console.log('starting game');
     let deck = cards.makeDeck();
     if(players[0].ranking){
@@ -86,6 +94,24 @@ io.on('connection', (socket) => {
     }
     io.to(table_id).emit('cards_dealt', players)
   })
+  socket.on('start_next_game', (players, table_id) => {
+    // make the piles
+    let deck = cards.makeDeck();
+    let piles = cards.makePiles(deck,players.length);
+    // make it the president's turn
+    players = players.map(player=> {
+      if(player.ranking==='President') player.isTurn = true;
+      else player.isTurn = false;
+      return player;
+    })
+    io.to(table_id).emit('start_pile_selection', players, piles)
+  })
+
+  /*
+  ==================================================
+  GAMEPLAY FUNCTIONALITY
+  ==================================================
+  */
   socket.on('pass', (players, username, played_cards, table_id) => {
     let index = arrayObjectIndexOf(players, username, 'username');
     changeTurns(players, index);

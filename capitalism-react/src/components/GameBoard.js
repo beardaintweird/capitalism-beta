@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import './GameBoard.css';
 
 import Hand from './Hand';
-import Pile from './Pile';
 import Player from './Player';
 import Completion from './Completion';
+import PlayedCards from './PlayedCards';
+import PileSelection from './PileSelection';
 
 class GameBoard extends Component {
   constructor(props){
@@ -13,12 +14,13 @@ class GameBoard extends Component {
     // pile
     //
     this.state = {
-      table_id: 'null',
       hand: [],
+      piles: [],
       players: [],
+      this_player: {},
       playerNames: [],
       played_cards: [],
-      this_player: {},
+      table_id: 'null',
       game_underway: false,
       isDoublesOnly: false,
       isTriplesOnly: false
@@ -46,9 +48,23 @@ class GameBoard extends Component {
       console.log(result);
       this.setState({playerNames: result.players})
     })
+    /*
+    ==================================================
+    GAME ADMINISTRATION FUNCTIONALITY
+    ==================================================
+    */
     this.props.socket.on('cards_dealt', (players) => {
-      this.updatePlayer(players)
+      this.updatePlayer(players);
     })
+    this.props.socket.on('start_pile_selection', (players, piles) => {
+      this.updatePlayer(players);
+      this.setState({piles});
+    })
+    /*
+    ==================================================
+    GAMEPLAY FUNCTIONALITY
+    ==================================================
+    */
     this.props.socket.on('pass_complete', (players, played_cards) => {
       console.log('pass_complete received from server.');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
@@ -94,6 +110,7 @@ class GameBoard extends Component {
     this.props.socket.on('game_finished', () => {
       this.setState({game_underway: false})
       console.log('Game finished!!');
+      this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
     })
     this.props.socket.on('clear', () => {
       this.setState({
@@ -202,7 +219,10 @@ class GameBoard extends Component {
   render() {
     let topCard;
     let players;
+    let completion;
+    let pileSelection;
     let startGameButton;
+
 
     if(this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
@@ -231,7 +251,6 @@ class GameBoard extends Component {
     } else {
       topCard = null;
     }
-    let completion;
     if(!this.state.this_player.isDone && this.checkForCompletions() !== null){
       let completionArray = this.checkForCompletions()
       completion = (<Completion
@@ -242,16 +261,23 @@ class GameBoard extends Component {
     } else {
       completion = (<Completion enabled={false} />)
     }
-    if(this.state.playerNames.length >= 4 && !this.state.game_underway){
+    // when this.state.players is not empty, the game has started.
+    // the startGameButton may cease to exist
+    if(!this.state.players.length
+      && this.state.playerNames[0] === localStorage.getItem('username')
+    ){
       startGameButton = (<button onClick={this.startGame}>Start Game</button>)
     }
-
+    if(this.state.piles.length && !this.state.game_underway){
+      pileSelection = (<PileSelection piles={this.state.piles} />)
+    }
     return (
       <div className="container">
         <div className="row">
           {players}
         </div>
-        <div className="row"><Pile cards={this.state.played_cards} /></div>
+        <div className="row"><PlayedCards cards={this.state.played_cards} /></div>
+        {pileSelection}
         <div className="row">
           <Hand
             data={this.state.hand}

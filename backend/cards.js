@@ -49,8 +49,8 @@ module.exports = {
     }
     return deck;
   },
-  shuffle(array){
-    var m = array.length;
+  shuffle(deck){
+    var m = deck.length;
     var t;
     var i;
     // While there remain elements to shuffle…
@@ -58,11 +58,11 @@ module.exports = {
       // Pick a remaining element…
       i = Math.floor(Math.random() * m--);
       // And swap it with the current element.
-      t = array[m];
-      array[m] = array[i];
-      array[i] = t;
+      t = deck[m];
+      deck[m] = deck[i];
+      deck[i] = t;
     }
-    return array;
+    return deck;
   },
   makeDeck(){
     let deck = this.createDeck();
