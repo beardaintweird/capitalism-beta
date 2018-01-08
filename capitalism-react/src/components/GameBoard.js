@@ -109,8 +109,9 @@ class GameBoard extends Component {
     })
     this.props.socket.on('game_finished', () => {
       this.setState({game_underway: false})
-      console.log('Game finished!!');
-      this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
+      console.log('Game finished!! ');
+      if(this.state.this_player.username === localStorage.getItem('username'))
+        this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
     })
     this.props.socket.on('clear', () => {
       this.setState({
@@ -130,7 +131,6 @@ class GameBoard extends Component {
     })
   }
   updatePlayer(players, callback){
-    console.log(players);
     this.setState({players: players}, () => {
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
