@@ -142,7 +142,7 @@ class GameBoard extends Component {
       })[0];
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
-          if(this.state.hand.cards.length === 0){
+          if(this.state.game_underway && this.state.hand.cards.length === 0){
             console.log('Done!');
           }
         })

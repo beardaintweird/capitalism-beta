@@ -23,22 +23,31 @@ class Pile extends Component {
     this.setState({images})
   }
   render() {
-    let pile_button;
+    let topCard;
+    let pileButton;
+    let topCardImage = this.props.pile.cards[0].image;
+    if(topCardImage.substring(0,4)=== 'img/'){
+      topCardImage = topCardImage.substring(4)
+    }
     if(this.props.isTurn){
-      pile_button = (
+      pileButton = (
         <button onClick={this.handleClick}>
-          <img className="bottom_card" src={this.state.images["back_green.png"]} alt='' />
+          <img
+          className="top_card"
+          src={this.state.images[topCardImage]} />
         </button>)
     } else {
-      pile_button = (
+      pileButton = (
         <button onClick={this.handleClick} disabled>
-          <img className="bottom_card" src={this.state.images["back_green.png"]} alt='' />
+          <img
+          className="top_card"
+          src={this.state.images[topCardImage]} />
         </button>)
     }
     return (
       <div className="pile">
-        {pile_button}
-        <img className="top_card" src={this.state.images[this.props.pile.cards[0].image]} />
+        {pileButton}
+        <img className="bottom_card" src={this.state.images["back_green.png"]} alt='' />
         <p>{this.props.pile.cards.length} cards</p>
       </div>
     )
