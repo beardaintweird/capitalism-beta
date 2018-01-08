@@ -29,6 +29,7 @@ class GameBoard extends Component {
     this.pass                = this.pass.bind(this);
     this.playCard            = this.playCard.bind(this);
     this.startGame           = this.startGame.bind(this);
+    this.selectPile          = this.selectPile.bind(this);
     this.playDoubles         = this.playDoubles.bind(this);
     this.playTriples         = this.playTriples.bind(this);
     this.updatePlayer        = this.updatePlayer.bind(this);
@@ -60,13 +61,17 @@ class GameBoard extends Component {
       this.updatePlayer(players);
       this.setState({piles});
     })
+    this.props.socket.on('pile_selected', (players,allPiles) => {
+      this.updatePlayer(players);
+      this.setState({piles: allPiles})
+    })
     /*
     ==================================================
     GAMEPLAY FUNCTIONALITY
     ==================================================
     */
     this.props.socket.on('pass_complete', (players, played_cards) => {
-      console.log('pass_complete received from server.');
+      console.log('pass_complete received from server. ');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
@@ -130,7 +135,6 @@ class GameBoard extends Component {
     })
   }
   updatePlayer(players, callback){
-    console.log(players);
     this.setState({players: players}, () => {
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
@@ -152,6 +156,9 @@ class GameBoard extends Component {
     let players = this.state.players.length ? this.state.players : this.state.playerNames
     this.props.socket.emit('startGame', players, this.state.table_id)
     this.setState({game_underway: true})
+  }
+  selectPile(pile, allPiles){
+    this.props.socket.emit('select_pile', this.state.players, this.state.this_player.username, pile, allPiles, this.state.table_id)
   }
   pass(e){
     console.log(`${this.state.this_player.username} passes `);
@@ -269,7 +276,11 @@ class GameBoard extends Component {
       startGameButton = (<button onClick={this.startGame}>Start Game</button>)
     }
     if(this.state.piles.length && !this.state.game_underway){
-      pileSelection = (<PileSelection piles={this.state.piles} />)
+      pileSelection = (
+        <PileSelection
+          selectPile={this.selectPile}
+          piles={this.state.piles}
+          isTurn={this.state.this_player.isTurn}/>)
     }
     return (
       <div className="container">
