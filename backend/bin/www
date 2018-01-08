@@ -56,17 +56,6 @@ io.on('connection', (socket) => {
     */
     console.log('starting game');
     // let deck = cards.makeDeck();
-    if(players[0].ranking){
-      // consecutive games
-      players = players.map(player=>{
-        player.isTurn = false;
-        player.isDone = false;
-        player.hand.cards = [];
-        player.previousRanking = player.ranking;
-        player.ranking = '';
-        return player;
-      })
-    } else {
       // first game
       players = players.map((player, index) => {
         let obj = {
@@ -83,15 +72,6 @@ io.on('connection', (socket) => {
         }
         return obj;
       })
-    }
-    // players = cards.dealRandomly(deck, players)
-    if(players[0].ranking){
-      players = players.map((player,index)=> {
-        player.isTurn = player.ranking === 'President' ? true : false
-        player.hand.cards.push(deck[index])
-        return player;
-      })
-    }
     let deck = [
        {
          title: 3,
