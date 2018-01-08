@@ -80,7 +80,7 @@ createDoublesTriplesAutos(){
   // to manage duplicates
   let uniqueKeys = [];
   let doublesTriplesAutos = [];
-  for(let i = 0, hand = this.props.data.cards; i < this.props.data.cards.length - 1; i++){
+  for(let i = 0, hand = this.props.hand.cards; i < this.props.hand.cards.length - 1; i++){
     let enabled = false;
     if(hand[i].rank === 13) continue;
     if(hand[i+1] && hand[i+1].rank===hand[i].rank){
@@ -143,8 +143,8 @@ createDoublesTriplesAutos(){
    let cards;
    let specials;
    let pass;
-   if(this.props.data.cards){
-     cards = this.props.data.cards.map((card) => {
+   if(this.props.hand.cards){
+     cards = this.props.hand.cards.map((card) => {
        let enable = this.isLegalCardToPlay(card);
        if(card.image.substring(0,4) === 'img/'){
          card.image = card.image.substring(4);

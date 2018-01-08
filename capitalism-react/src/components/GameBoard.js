@@ -23,7 +23,8 @@ class GameBoard extends Component {
       table_id: 'null',
       game_underway: false,
       isDoublesOnly: false,
-      isTriplesOnly: false
+      isTriplesOnly: false,
+      playerJoinedTable: false
     }
     this.bomb                = this.bomb.bind(this);
     this.pass                = this.pass.bind(this);
@@ -54,6 +55,10 @@ class GameBoard extends Component {
     GAME ADMINISTRATION FUNCTIONALITY
     ==================================================
     */
+    this.props.socket.on('table_joined', () => {
+      console.log('You have joined the table. ')
+      this.setState({playerJoinedTable: true})
+    })
     this.props.socket.on('cards_dealt', (players) => {
       this.updatePlayer(players);
     })
@@ -64,6 +69,9 @@ class GameBoard extends Component {
     this.props.socket.on('pile_selected', (players,allPiles) => {
       this.updatePlayer(players);
       this.setState({piles: allPiles})
+      if(!allPiles.length){
+        // trade cards
+      }
     })
     /*
     ==================================================
@@ -71,7 +79,7 @@ class GameBoard extends Component {
     ==================================================
     */
     this.props.socket.on('pass_complete', (players, played_cards) => {
-      console.log('pass_complete received from server. ');
+      console.log('pass_complete received from server.');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
@@ -88,7 +96,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_doubles_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('doubles!');
+      console.log('doubles! ');
       this.setState({
         isDoublesOnly: true
       }, () => {
@@ -105,7 +113,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_auto_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('Auto complete! ');
+      console.log('Auto complete!');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards, true);
     })
@@ -115,7 +123,7 @@ class GameBoard extends Component {
     this.props.socket.on('game_finished', () => {
       this.setState({game_underway: false})
       console.log('Game finished!! ');
-      if(this.state.this_player.username === localStorage.getItem('username'))
+      if(this.state.this_player.isTurn)
         this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
     })
     this.props.socket.on('clear', () => {
@@ -137,6 +145,7 @@ class GameBoard extends Component {
   }
   updatePlayer(players, callback){
     this.setState({players: players}, () => {
+      console.log(players);
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
       })[0];
@@ -232,7 +241,7 @@ class GameBoard extends Component {
     let startGameButton;
 
 
-    if(this.state.table_id !== 'null'){
+    if(!this.state.playerJoinedTable && this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
     }
     if(!this.state.players.length && this.state.playerNames){
@@ -292,7 +301,7 @@ class GameBoard extends Component {
         {pileSelection}
         <div className="row">
           <Hand
-            data={this.state.hand}
+            hand={this.state.hand}
             isTurn={this.state.this_player.isTurn}
             pass={this.pass}
             playCard={this.playCard}
