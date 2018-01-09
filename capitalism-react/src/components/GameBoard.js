@@ -157,7 +157,7 @@ class GameBoard extends Component {
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
           if(this.state.game_underway && this.state.hand.cards.length === 0){
-            console.log('Done! ');
+            console.log('Done!');
           }
         })
         this.setState({this_player: this_player})
@@ -232,7 +232,8 @@ class GameBoard extends Component {
     let userCompletion = this.state.hand.cards.filter((card) => {
       return card.rank === potentialCompletion[0].rank
     })
-    if(userCompletion.length + potentialCompletion.length === 4){
+    //(BUG FIX): first condition to prevent autocompletion passing this condition
+    if(userCompletion.length && userCompletion.length + potentialCompletion.length === 4){
       return userCompletion;
     } else {
       return false;

@@ -210,7 +210,7 @@ io.on('connection', (socket) => {
       played_cards.push(played_card);
     }
     checkIfPlayerIsDone(players, playerIndex, played_card);
-    changeTurns(players, playerIndex, false, table_id);
+    changeTurnsForCompletion(players, playerIndex);
     io.to(table_id).emit('play_auto_complete', players, played_cards);
     io.to(table_id).emit('clear')
   })
