@@ -166,7 +166,7 @@ createDoublesTriplesAutos(){
        )
      })
      specials = this.createDoublesTriplesAutos();
-     if(this.props.isTurn){
+     if(this.props.isTurn && this.props.topCard){
        pass = <button onClick={this.props.pass}>Pass</button>
      } else {
        pass = <button onClick={this.props.pass} disabled>Pass</button>

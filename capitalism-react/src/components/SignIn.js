@@ -17,16 +17,12 @@ class SignIn extends Component {
      this.handleChange = this.handleChange.bind(this)
    }
    componentDidMount(){
-     if(localStorage.getItem('id')) {
-       this.props.history.push('/')
-     } else {
-       // console.log(firebase.auth().currentUser);
-     }
+
    }
    handleSubmit(e){
      let errorMessage = ''
      firebase.auth().signInWithEmailAndPassword(this.state.email,this.state.password)
-      .then(() => {
+      .then((user) => {
         this.props.history.push('/')
       })
       .catch((err) => {

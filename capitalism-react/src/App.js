@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import SocketIoClient from 'socket.io-client';
-import firebase from './firebase';
+import firebase, {auth} from './firebase';
 
-import { getUser, objectKeys } from './api';
+import * as api from './api';
 
 import GameBoard from './components/GameBoard';
 import Nav from './components/Nav';
@@ -22,7 +22,9 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      timestamp: 'current time...'
+      timestamp: 'current time...',
+      isLoggedIn: false,
+      user: null
     }
 
     this.socket = SocketIoClient('http://localhost:3000');
@@ -30,18 +32,21 @@ class App extends Component {
       console.log('connected with server!');
     })
     let socket = this.socket;
-    this.joinRoom = this.joinRoom.bind(this)
+    this.joinRoom             = this.joinRoom.bind(this);
+    this.updateLogInStatus = this.updateLogInStatus.bind(this);
   }
 
   componentDidMount(){
-    firebase.auth().onAuthStateChanged(function(user) {
+    auth.onAuthStateChanged((user) => {
       if(user){
-        getUser(user.email);
+        api.getUser();
+        this.setState({isLoggedIn: true})
       } else {
-        let keys = objectKeys();
+        let keys = api.objectKeys();
         for(let key in keys){
           localStorage.removeItem(key);
         }
+        this.setState({isLoggedIn:false})
       }
     })
   }
@@ -49,16 +54,26 @@ class App extends Component {
     console.log('joining table:', table_id);
     this.socket.emit('joinTable', table_id)
   }
+  updateLogInStatus(){
+    if(firebase.auth().currentUser){
+      console.log('setting logged in');
+      this.setState({isLoggedIn: true})
+    } else {
+
+    }
+    console.log(firebase.auth().currentUser);
+  }
 
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to Caps</h1>
+          {this.state.isLoggedIn ? <p>You are logged in.</p> : <p>UH, LOG IN!</p>}
         </header>
         <Router>
           <div>
-            <Nav />
+            <Nav isLoggedIn={this.state.isLoggedIn} />
             <Route exact path="/"
               render={(socket, joinRoom) =>{
                 return(
@@ -74,8 +89,16 @@ class App extends Component {
                   )
               }
             }/>
-            <Route path="/login" component={SignIn} />
-            <Route path="/signup" component={SignUp} />
+            <Route path="/login" render={
+              (setLoggedIn) => {
+                return (<SignIn />)
+              }
+            } />
+            <Route path="/signup" render={
+              (setLoggedIn) => {
+                return(<SignUp />)
+              }
+            } />
           </div>
         </Router>
       </div>
