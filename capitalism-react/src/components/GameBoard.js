@@ -67,11 +67,16 @@ class GameBoard extends Component {
       this.setState({piles});
     })
     this.props.socket.on('pile_selected', (players,allPiles) => {
-      this.updatePlayer(players);
-      this.setState({piles: allPiles})
-      if(!allPiles.length){
-        // trade cards
+      this.updatePlayer(players,
+        function(allPiles){
+        // if(!allPiles.length){
+        //   this.setState({game_underway: true})
+        //   console.log('New round beginning ');
+        // }
       }
+    );
+    console.log(allPiles);
+      this.setState({piles: allPiles})
     })
     /*
     ==================================================
