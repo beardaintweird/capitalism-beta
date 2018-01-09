@@ -235,7 +235,7 @@ class GameBoard extends Component {
     if(userCompletion.length + potentialCompletion.length === 4){
       return userCompletion;
     } else {
-      return null;
+      return false;
     }
   }
   render() {
@@ -273,7 +273,8 @@ class GameBoard extends Component {
     } else {
       topCard = null;
     }
-    if(!this.state.this_player.isDone && this.checkForCompletions() !== null){
+    // needs performance upgrade
+    if(!this.state.this_player.isDone && this.checkForCompletions()){
       let completionArray = this.checkForCompletions()
       completion = (<Completion
         title={completionArray[0].title}

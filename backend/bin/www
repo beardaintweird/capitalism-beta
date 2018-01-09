@@ -142,33 +142,6 @@ io.on('connection', (socket) => {
     let scumTwosBestCards        = [];
     let presidentsWorstCards     = [];
     let vicePresidentsWorstCards = [];
-    // function getCards(players, isFavorable, ranking, numberOfCards){
-    //   let cards = []
-    //   players.map(player=>{
-    //     if(player.ranking === ranking){
-    //       let theCard = player.hand.cards[0];
-    //       for(let i = 0; i < numberOfCards; i++){
-    //         let cardIndex;
-    //         player.hand.cards.map((card,index)=>{
-    //           if(isFavorable){
-    //             if(card.rank < theCard.rank){
-    //               theCard = card
-    //               cardIndex = index
-    //             }
-    //           } else {
-    //             if(card.rank > theCard.rank){
-    //               theCard = card
-    //               cardIndex = index
-    //             }
-    //           }
-    //         })
-    //         cards.push(player.hand.cards.splice(cardIndex, 1)[0]);
-    //       }
-    //     }
-    //   })
-    //   console.log(ranking, cards);
-    //   return cards;
-    // }
     scumOnesBestCards        = getCards(players, false, 'Scum 1', 1);
     scumTwosBestCards        = getCards(players, false, 'Scum 2', 2);
     presidentsWorstCards     = getCards(players, true, 'President', 2);
