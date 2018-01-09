@@ -48,9 +48,6 @@ class App extends Component {
   joinRoom(table_id){
     console.log('joining table:', table_id);
     this.socket.emit('joinTable', table_id)
-    this.socket.on('hello', () => {
-      console.log('hello to our room!!!')
-    })
   }
 
   render() {

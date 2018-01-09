@@ -7,16 +7,12 @@ class PileSelection extends Component {
     super(props);
     this.state = {
     }
-
   }
-
-
   componentDidMount(){
 
   }
   render() {
     let piles = this.props.piles.map((pile,index)=>{
-      pile.cards[0].image = pile.cards[0].image.substring(4);
       return (
           <Pile
             key={index}

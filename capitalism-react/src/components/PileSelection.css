@@ -1,0 +1,17 @@
+.top_card {
+  margin-left: 5px;
+  margin-top: 5px;
+  z-index: 2;
+  background-color: white;
+  border: 1px solid black;
+  padding: 1px;
+  border-radius: 2px;
+}
+.bottom_card{
+  position: absolute;
+  z-index: -1;
+}
+.pile {
+  display: inline-block;
+  padding: 4px;
+}

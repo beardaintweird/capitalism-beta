@@ -42,8 +42,8 @@ io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('joinTable', (table_id) => {
     socket.join(table_id)
-    console.log('sockets joining room :D');
-    io.to(table_id).emit('hello')
+    console.log('sockets joining table :D');
+    io.to(table_id).emit('table_joined')
   })
   /*
   ==================================================
@@ -51,47 +51,25 @@ io.on('connection', (socket) => {
   ==================================================
   */
   socket.on('startGame', (players, table_id) => {
-    /*
-    TODO: REFACTOR THIS FOR SEAMLESS CONTINUANCE OF GAMES
-    */
     console.log('starting game');
     let deck = cards.makeDeck();
-    if(players[0].ranking){
-      // consecutive games
-      players = players.map(player=>{
-        player.isTurn = false;
-        player.isDone = false;
-        player.hand.cards = [];
-        player.previousRanking = player.ranking;
-        player.ranking = '';
-        return player;
-      })
-    } else {
-      // first game
-      players = players.map((player, index) => {
-        let obj = {
-          username: player,
-          previousRanking: '',
-          ranking: '',
-          number: index,
-          hand: {
-            cards:[]
-          },
-          isTurn: false,
-          isDone: false,
-          hasScummedOut: false
-        }
-        return obj;
-      })
-    }
+    // first game
+    players = players.map((player, index) => {
+      let obj = {
+        username: player,
+        previousRanking: '',
+        ranking: '',
+        number: index,
+        hand: {
+          cards:[]
+        },
+        isTurn: false,
+        isDone: false,
+        hasScummedOut: false
+      }
+      return obj;
+    })
     players = cards.dealRandomly(deck, players)
-    if(players[0].ranking){
-      players = players.map((player,index)=> {
-        player.isTurn = player.ranking === 'President' ? true : false
-        player.hand.cards.push(deck[index])
-        return player;
-      })
-    }
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('start_next_game', (players, table_id) => {
@@ -100,6 +78,7 @@ io.on('connection', (socket) => {
     let piles = cards.makePiles(deck,players.length);
     // make it the president's turn
     players = players.map(player=> {
+      player.isDone = false;
       if(player.ranking==='President') player.isTurn = true;
       else player.isTurn = false;
       return player;
@@ -110,11 +89,35 @@ io.on('connection', (socket) => {
     let searchTerm = pile.cards[0].title + '' + pile.cards[0].suit;
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     let pileIndex = findPileInPiles(allPiles, searchTerm, 'title', 'suit');
-    let selectedPile = allPiles.splice(pileIndex, 1);
+    let selectedPile = allPiles.splice(pileIndex, 1)[0];
+    // sort the pile here
+    selectedPile.cards.sort((a,b) => a.rank - b.rank);
     players[playerIndex].hand = selectedPile;
     players = changeTurnsForPileSelection(players, playerIndex);
+    if(!allPiles.length){
+      players = tradeCards(players);
+    }
     io.to(table_id).emit('pile_selected', players, allPiles);
   })
+  function tradeCards(players){
+    let scumOnesBestCards        = [];
+    let scumTwosBestCards        = [];
+    let presidentsWorstCards     = [];
+    let vicePresidentsWorstCards = [];
+    scumOnesBestCards        = getCards(players, false, 'Scum 1', 1);
+    scumTwosBestCards        = getCards(players, false, 'Scum 2', 2);
+    presidentsWorstCards     = getCards(players, true, 'President', 2);
+    vicePresidentsWorstCards = getCards(players, true, 'Vice president', 1);
+    players = addCards(players, scumTwosBestCards, 'President')
+    players = addCards(players, presidentsWorstCards, 'Scum 2')
+    players = addCards(players, vicePresidentsWorstCards, 'Scum 1')
+    players = addCards(players, scumOnesBestCards, 'Vice president')
+    players = players.map((player) => {
+      player.hand.cards.sort((a,b) => a.rank - b.rank);
+      return player;
+    })
+    return players;
+  }
   /*
   ==================================================
   GAMEPLAY FUNCTIONALITY
@@ -301,7 +304,14 @@ function setRankings(players, playerIndex){
   } else {
     if(donePlayers.filter(player=>player.ranking==='Vice president').length){
       if(donePlayers.filter(player=>player.ranking==='Scum 1').length){
-        players[playerIndex].ranking = 'Scum 2'
+        players = players.map(player=>{
+          if(!player.ranking){
+            player.ranking = 'Scum 2'
+            player.isDone = true;
+            player.hand.cards = [];
+          }
+          return player
+        })
       } else {
         players[playerIndex].ranking = 'Scum 1'
       }
@@ -323,6 +333,43 @@ function addScummedOutToRankings(players, playerIndex){
   } else {
     players[playerIndex].ranking = 'Scum 2'
   }
+}
+// can make much faster by hard coding the response for each of the rankings
+// specifically
+function getCards(players, isFavorable, ranking, numberOfCards){
+  let cards = []
+  players.map(player=>{
+    if(player.ranking === ranking){
+      for(let i = 0; i < numberOfCards; i++){
+        let theCard = player.hand.cards[0];
+        let cardIndex;
+        player.hand.cards.map((card,index)=>{
+          if(isFavorable){
+            if(card.rank < theCard.rank){
+              theCard = card
+              cardIndex = index
+            }
+          } else {
+            if(card.rank > theCard.rank){
+              theCard = card
+              cardIndex = index
+            }
+          }
+        })
+        cards.push(player.hand.cards.splice(cardIndex, 1)[0]);
+      }
+    }
+  })
+  return cards;
+}
+function addCards(players, cards, ranking){
+  return players.map(player =>{
+    if(player.ranking === ranking){
+      for(let i = 0; i < cards.length; i++)
+        player.hand.cards.push(cards[i])
+    }
+    return player
+  })
 }
 
 // helper functions

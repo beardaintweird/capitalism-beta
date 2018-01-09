@@ -23,7 +23,8 @@ class GameBoard extends Component {
       table_id: 'null',
       game_underway: false,
       isDoublesOnly: false,
-      isTriplesOnly: false
+      isTriplesOnly: false,
+      playerJoinedTable: false
     }
     this.bomb                = this.bomb.bind(this);
     this.pass                = this.pass.bind(this);
@@ -54,6 +55,10 @@ class GameBoard extends Component {
     GAME ADMINISTRATION FUNCTIONALITY
     ==================================================
     */
+    this.props.socket.on('table_joined', () => {
+      console.log('You have joined the table. ')
+      this.setState({playerJoinedTable: true})
+    })
     this.props.socket.on('cards_dealt', (players) => {
       this.updatePlayer(players);
     })
@@ -62,7 +67,15 @@ class GameBoard extends Component {
       this.setState({piles});
     })
     this.props.socket.on('pile_selected', (players,allPiles) => {
-      this.updatePlayer(players);
+      this.updatePlayer(players,
+        function(allPiles){
+        // if(!allPiles.length){
+        //   this.setState({game_underway: true})
+        //   console.log('New round beginning ');
+        // }
+      }
+    );
+    console.log(allPiles);
       this.setState({piles: allPiles})
     })
     /*
@@ -88,7 +101,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_doubles_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('doubles!');
+      console.log('doubles! ');
       this.setState({
         isDoublesOnly: true
       }, () => {
@@ -105,7 +118,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_auto_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('Auto complete! ');
+      console.log('Auto complete!');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards, true);
     })
@@ -114,8 +127,9 @@ class GameBoard extends Component {
     })
     this.props.socket.on('game_finished', () => {
       this.setState({game_underway: false})
-      console.log('Game finished!!');
-      this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
+      console.log('Game finished!! ');
+      if(this.state.this_player.isTurn)
+        this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
     })
     this.props.socket.on('clear', () => {
       this.setState({
@@ -136,13 +150,14 @@ class GameBoard extends Component {
   }
   updatePlayer(players, callback){
     this.setState({players: players}, () => {
+      console.log(players);
       let this_player = this.state.players.filter((player) => {
         return player.username === localStorage.getItem('username')
       })[0];
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
-          if(this.state.hand.cards.length === 0){
-            console.log('Done!');
+          if(this.state.game_underway && this.state.hand.cards.length === 0){
+            console.log('Done! ');
           }
         })
         this.setState({this_player: this_player})
@@ -220,7 +235,7 @@ class GameBoard extends Component {
     if(userCompletion.length + potentialCompletion.length === 4){
       return userCompletion;
     } else {
-      return null;
+      return false;
     }
   }
   render() {
@@ -231,7 +246,7 @@ class GameBoard extends Component {
     let startGameButton;
 
 
-    if(this.state.table_id !== 'null'){
+    if(!this.state.playerJoinedTable && this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)
     }
     if(!this.state.players.length && this.state.playerNames){
@@ -258,7 +273,8 @@ class GameBoard extends Component {
     } else {
       topCard = null;
     }
-    if(!this.state.this_player.isDone && this.checkForCompletions() !== null){
+    // needs performance upgrade
+    if(!this.state.this_player.isDone && this.checkForCompletions()){
       let completionArray = this.checkForCompletions()
       completion = (<Completion
         title={completionArray[0].title}
@@ -291,7 +307,7 @@ class GameBoard extends Component {
         {pileSelection}
         <div className="row">
           <Hand
-            data={this.state.hand}
+            hand={this.state.hand}
             isTurn={this.state.this_player.isTurn}
             pass={this.pass}
             playCard={this.playCard}
