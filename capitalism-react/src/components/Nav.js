@@ -32,15 +32,18 @@ class Nav extends Component {
        'Content-Type': 'application/json'
      },
      body: JSON.stringify({
-       player_id: localStorage.getItem('id'),
-       table_id: localStorage.getItem('table_id')
+       player_id: this.props.id,
+       table_id: this.props.table_id,
+       username: this.props.username
      })
    }
    fetch('http://localhost:3000/table/leave', options)
    .then(res=>res.json())
    .then((result) => {
      // returns [1] or [0]
-     localStorage.removeItem('table_id');
+     console.log('result from table leave', result);
+     if(result[0]===1)
+      this.props.updateAfterLeavingTable();
    })
  }
  render() {

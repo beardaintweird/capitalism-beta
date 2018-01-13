@@ -22,9 +22,11 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      timestamp: 'current time...',
+      id: -1,
+      tables:[],
+      table_id: -1,
+      username: '',
       isLoggedIn: false,
-      user: null
     }
 
     this.socket = SocketIoClient('http://localhost:3000');
@@ -32,24 +34,37 @@ class App extends Component {
       console.log('connected with server!');
     })
     let socket = this.socket;
-    this.joinRoom             = this.joinRoom.bind(this);
-    this.updateLogInStatus = this.updateLogInStatus.bind(this);
+    this.joinRoom                = this.joinRoom.bind(this);
+    this.updateTables            = this.updateTables.bind(this);
+    this.updateTableId           = this.updateTableId.bind(this);
+    this.updateLogInStatus       = this.updateLogInStatus.bind(this);
+    this.updateAfterLeavingTable = this.updateAfterLeavingTable.bind(this);
   }
 
   componentDidMount(){
     auth.onAuthStateChanged((user) => {
       if(user){
-        api.getUser();
-        this.setState({isLoggedIn: true})
+        let userInfo = api.getUser(auth.currentUser.email).then((userInfo) => {
+          console.log(userInfo);
+          this.setState({
+            isLoggedIn: true,
+            id: userInfo[0].id,
+            table_id: userInfo[0].table_id,
+            username: userInfo[0].username
+          })
+        })
+
       } else {
-        let keys = api.objectKeys();
-        for(let key in keys){
-          localStorage.removeItem(key);
-        }
-        this.setState({isLoggedIn:false})
+        this.setState({
+          id:-1,
+          username: '',
+          table_id: -1,
+          isLoggedIn:false
+        })
       }
     })
   }
+
   joinRoom(table_id){
     console.log('joining table:', table_id);
     this.socket.emit('joinTable', table_id)
@@ -58,10 +73,26 @@ class App extends Component {
     if(firebase.auth().currentUser){
       console.log('setting logged in');
       this.setState({isLoggedIn: true})
-    } else {
-
     }
-    console.log(firebase.auth().currentUser);
+  }
+  // after player joins the table
+  updateTableId(table_id){
+    this.setState({table_id})
+    this.updateTables()
+  }
+  updateAfterLeavingTable(){
+    this.setState({
+      table_id: -1
+    })
+    this.updateTables()
+  }
+  updateTables(){
+    fetch('http://localhost:3000/table')
+    .then(res=>res.json())
+    .then(result => {
+      console.log('updating tables', result);
+      this.setState({ tables: result })
+    })
   }
 
   render() {
@@ -69,15 +100,27 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to Caps</h1>
-          {this.state.isLoggedIn ? <p>You are logged in.</p> : <p>UH, LOG IN!</p>}
         </header>
         <Router>
           <div>
-            <Nav isLoggedIn={this.state.isLoggedIn} />
+            <Nav
+              isLoggedIn={this.state.isLoggedIn}
+              id={this.state.id}
+              table_id={this.state.table_id}
+              username={this.state.username}
+              updateAfterLeavingTable={this.updateAfterLeavingTable} />
             <Route exact path="/"
               render={(socket, joinRoom) =>{
                 return(
-                  <TableMenu socket={this.socket} joinRoom={this.joinRoom} />
+                  <TableMenu
+                    tables={this.state.tables}
+                    socket={this.socket}
+                    joinRoom={this.joinRoom}
+                    username={this.state.username}
+                    updateTables={this.updateTables}
+                    isLoggedIn={this.state.isLoggedIn}
+                    updateTableId={this.updateTableId}
+                    playerTableId={this.state.table_id}/>
                 )
                 }
               }/>

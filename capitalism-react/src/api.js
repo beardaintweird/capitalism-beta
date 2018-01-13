@@ -1,12 +1,7 @@
 module.exports = {
   getUser(email){
-    fetch(`http://localhost:3000/player/${email}`)
+    return fetch(`http://localhost:3000/player/${email}`)
     .then(res=>res.json())
-    .then((player) => {
-      for(let key in player[0]){
-        localStorage.setItem(key, player[0][key]);
-      }
-    })
   },
   createUser(first_name, last_name, username, email){
     const options = {

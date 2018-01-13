@@ -12,46 +12,42 @@ import { withRouter } from 'react-router-dom';
    constructor(props){
      super(props);
      this.state = {
-       tables: []
      }
-     this.updateState = this.updateState.bind(this)
    }
    componentDidMount(){
-     this.updateState()
-   }
-   updateState(){
-     fetch('http://localhost:3000/table')
-     .then(res=>res.json())
-     .then(result => {
-       this.setState({ tables: result })
-     })
+     this.props.updateTables()
    }
    render() {
+     let tables;
+     let tableForm = this.props.isLoggedIn ?
+      (<TableForm joinRoom={this.props.joinRoom} socket={this.props.socket} />)
+      : '';
+     if(this.props.tables){
+       tables = this.props.tables.map((table) => {
+         return (
+           <Table key={table.id}
+           table_id={table.id}
+           table_name={table.name}
+           players={table.Players}
+           username={this.props.username}
+           joinRoom={this.props.joinRoom}
+           isLoggedIn={this.props.isLoggedIn}
+           updateTableId={this.props.updateTableId}
+           playerTableId={this.props.playerTableId} />)
+       })
+     }
      return (
        <div className="container">
         <div className="row">
           <div className="col s3"></div>
           <div className="col s6">
-          {
-            firebase.auth().currentUser ?
-            <TableForm joinRoom={this.props.joinRoom} socket={this.props.socket} />
-            : ''
-          }
-
+          {tableForm}
           </div>
           <div className="col s3"></div>
         </div>
         <div className="row">
-          {this.state.tables.map((table) => {
-            return (
-              <Table key={table.id}
-              joinRoom={this.props.joinRoom}
-              table_id={table.id}
-              table_name={table.name}
-              players={table.Players} />)
-          })}
+          {tables}
         </div>
-        <p>Tables here...</p>
        </div>
      )
    }
