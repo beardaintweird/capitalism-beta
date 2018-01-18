@@ -41,12 +41,15 @@ import React, {Component} from 'react';
      console.log('clicked join');
    }
    shouldUserJoinTable(){
-     return this.props.isLoggedIn && !this.props.playerTableId
+     console.log('should join table ', this.props.playerTableId, this.props.playerTableId !== -1);
+     return this.props.isLoggedIn && this.props.playerTableId === -1
    }
    goToGameBoard(e){
      this.props.history.push(`/gameboard/${this.props.table_id}`)
    }
    render() {
+     console.log('table', this.props.players);
+     console.log('should go table', this.props.table_id, this.props.playerTableId);
      let enabled    = this.shouldUserJoinTable();
      let joinButton = enabled ? (<button onClick={this.handleClick} >Join</button>) : '';
      let goButton   = this.props.table_id === this.props.playerTableId

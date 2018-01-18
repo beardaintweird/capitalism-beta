@@ -2,9 +2,9 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('tables', [{
+    return queryInterface.bulkInsert('table', [{
       name: 'test_table',
-      players: ['Beardaintweird', 'whatbeard', 'schmittyisdabomb','trolololol'],
+      playerNames: ['Beardaintweird', 'whatbeard', 'schmittyisdabomb','trolololol'],
       player_limit: 6,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -22,7 +22,7 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('tables', null, {});
+    return queryInterface.bulkDelete('table', null, {});
     /*
       Add reverting commands here.
       Return a promise to correctly handle asynchronicity.

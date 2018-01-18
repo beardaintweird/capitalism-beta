@@ -1,15 +1,17 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var Player = sequelize.define('Player', {
+  var player = sequelize.define('player', {
     name: DataTypes.STRING,
     username: DataTypes.STRING,
     games_played: DataTypes.INTEGER,
     email: DataTypes.STRING,
     points: DataTypes.INTEGER,
     table_id: DataTypes.INTEGER
+  },{
+    freezeTableName: true
   });
-  Player.associate = function(models){
-    Player.hasOne(models.table, {foreignKey: 'id'})
+  player.associate = function(models){
+    player.hasOne(models.table, {foreignKey: 'id'})
   }
-  return Player;
+  return player;
 };

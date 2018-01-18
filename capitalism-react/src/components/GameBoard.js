@@ -56,7 +56,7 @@ class GameBoard extends Component {
     ==================================================
     */
     this.props.socket.on('table_joined', () => {
-      console.log('You have joined the table. ')
+      console.log('You have joined the table.')
       this.setState({playerJoinedTable: true})
     })
     this.props.socket.on('cards_dealt', (players) => {

@@ -23,9 +23,11 @@ import { withRouter } from 'react-router-dom';
       (<TableForm joinRoom={this.props.joinRoom} socket={this.props.socket} />)
       : '';
      if(this.props.tables){
+       console.log('tableMenu tables',this.props.tables);
        tables = this.props.tables.map((table) => {
          return (
            <Table key={table.id}
+           id={this.props.id}
            table_id={table.id}
            table_name={table.name}
            players={table.Players}

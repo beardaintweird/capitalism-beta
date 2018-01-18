@@ -8,14 +8,17 @@ router.get('/', function(req, res, next) {
 });
 // get player
 router.get('/player/:email', (req,res,next) => {
-  db.Player.findAll({
+  db.player.findAll({
     where: {
       email: req.params.email
     }
   })
     .then((player) => {
       res.json(player)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // add player
 router.post('/player', (req,res,next) => {
@@ -29,10 +32,13 @@ router.post('/player', (req,res,next) => {
     "table_id": null
   }
   */
-  db.Player.create(req.body)
+  db.player.create(req.body)
     .then((player) => {
       res.json(player)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // Add table
 router.post('/table', (req,res,next) => {
@@ -43,11 +49,13 @@ router.post('/table', (req,res,next) => {
     "player_limit": 6
   }
   */
-  console.log(req.body);
   db.table.create(req.body)
     .then((table) => {
       res.json(table)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // Add player to table
 router.post('/table/addPlayer', (req,res,next) => {
@@ -84,7 +92,7 @@ router.post('/table/addPlayer', (req,res,next) => {
       })
     })
     .then((table) => {
-      return db.Player.update({
+      return db.player.update({
         table_id: req.body.table_id
       }, {
         where: {
@@ -94,7 +102,10 @@ router.post('/table/addPlayer', (req,res,next) => {
     })
     .then((player) => {
       if(player) res.json("shuccess")
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // leave table
 router.post('/table/leave', (req,res,next) => {
@@ -105,7 +116,7 @@ router.post('/table/leave', (req,res,next) => {
   }
   */
   console.log(req.body);
-  db.Player.update({table_id: null}, {
+  db.player.update({table_id: null}, {
     where: {
       "id":req.body.player_id
     }
@@ -127,25 +138,35 @@ router.post('/table/leave', (req,res,next) => {
   })
   .then((result) => {
     res.json(result)
-  }).catch(err=>res.status(500).json(err))
+  }).catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
 })
 // Get tables
 router.get('/table', (req,res,next) => {
   db.table.findAll({
     include: [{
-      model: db.Player
+      model: db.player
     }]
   })
     .then((tables) => {
+      console.log(tables);
       res.json(tables)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // Get one table
 router.get('/table/:id', (req,res,next) => {
   db.table.findById(req.params.id)
   .then((table) => {
     res.json(table)
-  }).catch(err=>res.status(500).json(err))
+  }).catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
 })
 
 
@@ -157,16 +178,19 @@ router.post('/points', (req,res,next) => {
     "points": 2,
   }
   */
-  db.Player.findById(req.body.id)
+  db.player.findById(req.body.id)
     .then((player) => {
       console.log("player",player);
-      return db.Player.update({"points":req.body.points + player.dataValues.points}, {
+      return db.player.update({"points":req.body.points + player.dataValues.points}, {
           where: { "id":req.body.id}
         })
     })
     .then((updated_player) => {
       res.json(updated_player)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 // update games played
 router.post('/games_played', (req,res,next) => {
@@ -176,15 +200,18 @@ router.post('/games_played', (req,res,next) => {
 
   }
   */
-  db.Player.findById(req.body.id)
+  db.player.findById(req.body.id)
   .then((player) => {
-    return db.Player.update({"games_played": player.dataValues.games_played + 1}, {
+    return db.player.update({"games_played": player.dataValues.games_played + 1}, {
       where: { "id":player.dataValues.id}
     })
   })
     .then((player) => {
       res.json(player)
-    }).catch(err=>res.status(500).json(err))
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
 })
 
 

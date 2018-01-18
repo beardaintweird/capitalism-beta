@@ -3,10 +3,12 @@ module.exports = (sequelize, DataTypes) => {
   var table = sequelize.define('table', {
     name: DataTypes.STRING,
     player_limit: DataTypes.INTEGER,
-    players: DataTypes.ARRAY(DataTypes.STRING)
+    playerNames: DataTypes.ARRAY(DataTypes.STRING)
+  },{
+    freezeTableName:true
   });
   table.associate = function(models){
-    table.hasMany(models.Player, {
+    table.hasMany(models.player, {
       foreignKey: 'table_id'
     })
   }

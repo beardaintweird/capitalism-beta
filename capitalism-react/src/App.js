@@ -77,7 +77,8 @@ class App extends Component {
   }
   // after player joins the table
   updateTableId(table_id){
-    this.setState({table_id})
+    console.log('after player joins',table_id);
+    this.setState({table_id: table_id})
     this.updateTables()
   }
   updateAfterLeavingTable(){
@@ -113,9 +114,10 @@ class App extends Component {
               render={(socket, joinRoom) =>{
                 return(
                   <TableMenu
-                    tables={this.state.tables}
+                    id={this.state.id}
                     socket={this.socket}
                     joinRoom={this.joinRoom}
+                    tables={this.state.tables}
                     username={this.state.username}
                     updateTables={this.updateTables}
                     isLoggedIn={this.state.isLoggedIn}
