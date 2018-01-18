@@ -30,7 +30,7 @@ import { withRouter } from 'react-router-dom';
            id={this.props.id}
            table_id={table.id}
            table_name={table.name}
-           players={table.Players}
+           players={table.playerNames}
            username={this.props.username}
            joinRoom={this.props.joinRoom}
            isLoggedIn={this.props.isLoggedIn}

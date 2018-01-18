@@ -61,7 +61,7 @@ import React, {Component} from 'react';
             <span className="card-title">{this.props.table_name}</span>
             <ul>
               {this.props.players ? this.props.players.map((player) => {
-                return (<li key={player.id}>{player.username}</li>)
+                return (<li key={player}>{player}</li>)
               }) : 'no players'
             }
             </ul>

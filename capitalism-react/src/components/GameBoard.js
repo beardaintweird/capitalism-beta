@@ -47,8 +47,7 @@ class GameBoard extends Component {
     fetch(`http://localhost:3000/table/${table_id}`)
     .then(res=>res.json())
     .then((result) => {
-      console.log(result);
-      this.setState({playerNames: result.players})
+      this.setState({playerNames: result.playerNames})
     })
     /*
     ==================================================
@@ -245,7 +244,6 @@ class GameBoard extends Component {
     let completion;
     let pileSelection;
     let startGameButton;
-
 
     if(!this.state.playerJoinedTable && this.state.table_id !== 'null'){
       this.props.joinRoom(this.state.table_id)

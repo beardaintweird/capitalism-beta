@@ -34,6 +34,7 @@ class App extends Component {
       console.log('connected with server!');
     })
     let socket = this.socket;
+
     this.joinRoom                = this.joinRoom.bind(this);
     this.updateTables            = this.updateTables.bind(this);
     this.updateTableId           = this.updateTableId.bind(this);
@@ -45,7 +46,6 @@ class App extends Component {
     auth.onAuthStateChanged((user) => {
       if(user){
         let userInfo = api.getUser(auth.currentUser.email).then((userInfo) => {
-          console.log(userInfo);
           this.setState({
             isLoggedIn: true,
             id: userInfo[0].id,

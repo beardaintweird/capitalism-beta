@@ -6,6 +6,10 @@ const db      = require('../models');
 router.get('/', function(req, res, next) {
   res.send('express connected');
 });
+
+/*
+==========PLAYER ROUTES==========
+*/
 // get player
 router.get('/player/:email', (req,res,next) => {
   db.player.findAll({
@@ -40,135 +44,6 @@ router.post('/player', (req,res,next) => {
       res.status(500)
     })
 })
-// Add table
-router.post('/table', (req,res,next) => {
-  /*
-  Request format:
-  {
-    "name": "champsOnly",
-    "player_limit": 6
-  }
-  */
-  db.table.create(req.body)
-    .then((table) => {
-      res.json(table)
-    }).catch(err=>{
-      console.log(err);
-      res.status(500)
-    })
-})
-// Add player to table
-router.post('/table/addPlayer', (req,res,next) => {
-  /*
-  Request format:
-  {
-    "table_id": 1234,
-    "player": "Beardaintweird",
-    "player_id": 1
-  }
-  */
-  console.log(req.body);
-  db.table.findById(req.body.table_id, {
-    attributes: ['id','name','players']
-  })
-    .then((table) => {
-      if(!table.players) table.players = [req.body.player]
-      else {
-        let player_exists = false;
-        let matched_names = table.players.filter((playerName) => {
-          return req.body.player == playerName
-        })
-        player_exists = matched_names.length ? true : false;
-        if(player_exists) res.json('player already in table');
-        table.players.push(req.body.player)
-      }
-      console.log('after push');
-      return table.update({
-        players: table.players
-      },{
-        where: {
-          id: req.body.table_id
-        }
-      })
-    })
-    .then((table) => {
-      return db.player.update({
-        table_id: req.body.table_id
-      }, {
-        where: {
-          id: req.body.player_id
-        }
-      })
-    })
-    .then((player) => {
-      if(player) res.json("shuccess")
-    }).catch(err=>{
-      console.log(err);
-      res.status(500)
-    })
-})
-// leave table
-router.post('/table/leave', (req,res,next) => {
-  /*
-  {
-    player_id: 1234,
-    table_id: 123
-  }
-  */
-  console.log(req.body);
-  db.player.update({table_id: null}, {
-    where: {
-      "id":req.body.player_id
-    }
-  })
-  .then((res) => {
-    console.log(res);
-    return db.table.findById(req.body.table_id)
-  })
-  .then((table) => {
-    table.players = table.players.filter((player) => {
-      return player != req.body.username
-    })
-    return db.table.update({players: table.players},
-    {
-      where: {
-        id: table.id
-      }
-    })
-  })
-  .then((result) => {
-    res.json(result)
-  }).catch(err=>{
-    console.log(err);
-    res.status(500)
-  })
-})
-// Get tables
-router.get('/table', (req,res,next) => {
-  db.table.findAll({
-    include: [{
-      model: db.player
-    }]
-  })
-    .then((tables) => {
-      console.log(tables);
-      res.json(tables)
-    }).catch(err=>{
-      console.log(err);
-      res.status(500)
-    })
-})
-// Get one table
-router.get('/table/:id', (req,res,next) => {
-  db.table.findById(req.params.id)
-  .then((table) => {
-    res.json(table)
-  }).catch(err=>{
-    console.log(err);
-    res.status(500)
-  })
-})
-
 
 // Add points
 router.post('/points', (req,res,next) => {
@@ -214,5 +89,136 @@ router.post('/games_played', (req,res,next) => {
     })
 })
 
+/*
+==========TABLE ROUTES==========
+*/
+
+// Add table
+router.post('/table', (req,res,next) => {
+  /*
+  Request format:
+  {
+    "name": "champsOnly",
+    "player_limit": 6
+  }
+  */
+  db.table.create(req.body)
+    .then((table) => {
+      res.json(table)
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
+})
+// Add player to table
+router.post('/table/addPlayer', (req,res,next) => {
+  /*
+  Request format:
+  {
+    "table_id": 1234,
+    "player": "Beardaintweird",
+    "player_id": 1
+  }
+  */
+  console.log(req.body);
+  db.table.findById(req.body.table_id, {
+    attributes: ['id','name','players']
+  })
+    .then((table) => {
+      if(!table.playerNames) table.playerNames = [req.body.player]
+      else {
+        let player_exists = false;
+        table.playerNames.map((playerName) => {
+          player_exists = playerName === req.body.player ? true : false
+        })
+        if(player_exists) return res.json('player already in table');
+        table.playerNames.push(req.body.player)
+      }
+      console.log('after push');
+      return table.update({
+        playerNames: table.playerNames
+      },{
+        where: {
+          id: req.body.table_id
+        }
+      })
+    })
+    .then((table) => {
+      return db.player.update({
+        table_id: req.body.table_id
+      }, {
+        where: {
+          id: req.body.player_id
+        }
+      })
+    })
+    .then((player) => {
+      if(player) res.json("shuccess")
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
+})
+// leave table
+router.post('/table/leave', (req,res,next) => {
+  /*
+  {
+    player_id: 1234,
+    table_id: 123
+  }
+  */
+  console.log(req.body);
+  db.player.update({table_id: null}, {
+    where: {
+      "id":req.body.player_id
+    }
+  })
+  .then((res) => {
+    console.log(res);
+    return db.table.findById(req.body.table_id)
+  })
+  .then((table) => {
+    table.playerNames = table.playerNames.filter((player) => {
+      return player != req.body.username
+    })
+    return db.table.update({playerNames: table.playerNames},
+    {
+      where: {
+        id: table.id
+      }
+    })
+  })
+  .then((result) => {
+    res.json(result)
+  }).catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
+})
+// Get tables
+router.get('/table', (req,res,next) => {
+  db.table.findAll({
+    include: [{
+      model: db.player
+    }]
+  })
+    .then((tables) => {
+      console.log(tables);
+      res.json(tables)
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
+})
+// Get one table
+router.get('/table/:id', (req,res,next) => {
+  db.table.findById(req.params.id)
+  .then((table) => {
+    res.json(table)
+  }).catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
+})
 
 module.exports = router;
