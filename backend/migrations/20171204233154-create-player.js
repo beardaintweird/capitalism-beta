@@ -26,6 +26,21 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      hand: {
+        type: Sequelize.JSON
+      },
+      isTurn: {
+        type: Sequelize.BOOLEAN
+      },
+      isDone: {
+        type: Sequelize.BOOLEAN
+      },
+      ranking: {
+        type: Sequelize.STRING
+      },
+      previousRanking: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

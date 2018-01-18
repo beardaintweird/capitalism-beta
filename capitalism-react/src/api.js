@@ -3,6 +3,9 @@ module.exports = {
     return fetch(`http://localhost:3000/player/${email}`)
     .then(res=>res.json())
   },
+  getUserViaUsername(username){
+    
+  },
   createUser(first_name, last_name, username, email){
     const options = {
       method: 'POST',
@@ -28,6 +31,24 @@ module.exports = {
         console.log(key,result[key]);
       }
       // localStorage.setItem('user', result)
+    })
+  },
+  updateGameUnderway(table_id,game_underway){
+    const options = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        table_id: table_id,
+        game_underway: game_underway
+      })
+    }
+    fetch('http://localhost:3000/table/game_underway', options)
+    .then(res=>res.json())
+    .then(result=> {
+      console.log('game_underway update result:',result);
     })
   },
   objectKeys(){

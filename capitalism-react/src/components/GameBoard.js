@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './GameBoard.css';
+import { updateGameUnderway, getUser } from '../api';
 
 import Hand from './Hand';
 import Player from './Player';
@@ -41,14 +42,6 @@ class GameBoard extends Component {
 
   }
   componentDidMount(){
-    let table_id = window.location.href.match(/d\/\d+$/)[0];
-    table_id = table_id.substring(2)
-    this.setState({table_id})
-    fetch(`http://localhost:3000/table/${table_id}`)
-    .then(res=>res.json())
-    .then((result) => {
-      this.setState({playerNames: result.playerNames})
-    })
     /*
     ==================================================
     GAME ADMINISTRATION FUNCTIONALITY
@@ -128,7 +121,7 @@ class GameBoard extends Component {
       this.setState({game_underway: false})
       console.log('Game finished!! ');
       if(this.state.this_player.isTurn)
-        this.props.socket.emit('start_next_game', this.state.players, this.state.table_id)
+        this.props.socket.emit('start_next_game', this.state.players, this.props.table_id)
     })
     this.props.socket.on('clear', () => {
       this.setState({
@@ -139,7 +132,22 @@ class GameBoard extends Component {
     })
   }
   componentDidUpdate(){
+    if(this.props.table_id > 0 && !this.state.playerNames.length){
+      fetch(`http://localhost:3000/table/${this.props.table_id}`)
+      .then(res=>res.json())
+      .then((result) => {
+        console.log('table',result);
+        this.setState({
+          playerNames: result.playerNames,
+          game_underway: result.game_underway
+        })
 
+        if(result.game_underway && !this.state.players.length){
+          // update the current player's state
+          console.log('player needs to have his info updated!!!');
+        }
+      })
+    }
   }
   updatePlayedCards(played_cards, autoComplete){
     this.setState({played_cards}, () => {
@@ -168,22 +176,23 @@ class GameBoard extends Component {
   }
   startGame(e){
     let players = this.state.players.length ? this.state.players : this.state.playerNames
-    this.props.socket.emit('startGame', players, this.state.table_id)
+    this.props.socket.emit('startGame', players, this.props.table_id)
     this.setState({game_underway: true})
+    updateGameUnderway(this.props.table_id, true);
   }
   selectPile(pile, allPiles){
-    this.props.socket.emit('select_pile', this.state.players, this.state.this_player.username, pile, allPiles, this.state.table_id)
+    this.props.socket.emit('select_pile', this.state.players, this.state.this_player.username, pile, allPiles, this.props.table_id)
   }
   pass(e){
     console.log(`${this.state.this_player.username} passes `);
-    this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   playCard(card){
     card.username = this.state.this_player.username;
-    this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('play_card', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   bomb(card){
-    this.props.socket.emit('bomb', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.state.table_id);
+    this.props.socket.emit('bomb', this.state.players, card, this.state.this_player.username, this.state.played_cards, this.props.table_id);
   }
   playDoubles(title){
     let cards = this.state.hand.cards.filter((card) => {
@@ -192,7 +201,7 @@ class GameBoard extends Component {
     if(cards.length > 2){
       cards = cards.splice(0,2);
     }
-    this.props.socket.emit('play_doubles', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('play_doubles', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   playTriples(title){
     let cards = this.state.hand.cards.filter((card) => {
@@ -201,16 +210,16 @@ class GameBoard extends Component {
     if(cards.length > 3){
       cards = cards.splice(0,3);
     }
-    this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('play_triples', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   autoComplete(title){
     let cards = this.state.hand.cards.filter((card) => {
       return card.title === title;
     });
-    this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('auto_complete', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   playCompletion(cards){
-    this.props.socket.emit('play_completion', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.state.table_id)
+    this.props.socket.emit('play_completion', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   checkForCompletions(){
     if(!this.state.played_cards.length){
@@ -245,8 +254,8 @@ class GameBoard extends Component {
     let pileSelection;
     let startGameButton;
 
-    if(!this.state.playerJoinedTable && this.state.table_id !== 'null'){
-      this.props.joinRoom(this.state.table_id)
+    if(!this.state.playerJoinedTable && this.props.table_id !== 'null'){
+      this.props.joinRoom(this.props.table_id)
     }
     if(!this.state.players.length && this.state.playerNames){
       players = this.state.playerNames.map((playerName) => {
@@ -287,6 +296,7 @@ class GameBoard extends Component {
     // the startGameButton may cease to exist
     if(!this.state.players.length
       && this.state.playerNames[0] === localStorage.getItem('username')
+      && !this.state.game_underway
     ){
       startGameButton = (<button onClick={this.startGame}>Start Game</button>)
     }

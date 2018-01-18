@@ -17,6 +17,15 @@ module.exports = {
       playerNames: {
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
+      game_underway: {
+        type: Sequelize.BOOLEAN
+      },
+      playersInGame: {
+        type: Sequelize.JSON
+      },
+      playedCards: {
+        type: Sequelize.JSON
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

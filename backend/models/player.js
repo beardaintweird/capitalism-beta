@@ -6,7 +6,12 @@ module.exports = (sequelize, DataTypes) => {
     games_played: DataTypes.INTEGER,
     email: DataTypes.STRING,
     points: DataTypes.INTEGER,
-    table_id: DataTypes.INTEGER
+    table_id: DataTypes.INTEGER,
+    hand: DataTypes.JSON,
+    isTurn: DataTypes.BOOLEAN,
+    isDone: DataTypes.BOOLEAN,
+    ranking: DataTypes.STRING,
+    previousRanking: DataTypes.STRING
   },{
     freezeTableName: true
   });

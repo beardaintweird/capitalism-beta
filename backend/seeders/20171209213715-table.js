@@ -6,6 +6,9 @@ module.exports = {
       name: 'test_table',
       playerNames: ['Beardaintweird', 'whatbeard', 'schmittyisdabomb','trolololol'],
       player_limit: 6,
+      game_underway: false,
+      playersInGame: null,
+      playedCards: null,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

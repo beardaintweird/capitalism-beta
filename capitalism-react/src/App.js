@@ -24,6 +24,7 @@ class App extends Component {
     this.state = {
       id: -1,
       tables:[],
+      hand:[],
       table_id: -1,
       username: '',
       isLoggedIn: false,
@@ -50,7 +51,8 @@ class App extends Component {
             isLoggedIn: true,
             id: userInfo[0].id,
             table_id: userInfo[0].table_id,
-            username: userInfo[0].username
+            username: userInfo[0].username,
+            hand: userInfo[0].hand
           })
         })
 
@@ -66,6 +68,7 @@ class App extends Component {
   }
 
   joinRoom(table_id){
+    if(table_id < 0) return;
     console.log('joining table:', table_id);
     this.socket.emit('joinTable', table_id)
   }
@@ -130,7 +133,12 @@ class App extends Component {
               render={
                 (socket, joinRoom) => {
                   return (
-                    <GameBoard socket={this.socket} joinRoom={this.joinRoom} />
+                    <GameBoard
+                      socket={this.socket}
+                      hand={this.state.hand}
+                      joinRoom={this.joinRoom}
+                      table_id={this.state.table_id}
+                       />
                   )
               }
             }/>

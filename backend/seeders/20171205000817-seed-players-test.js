@@ -10,6 +10,11 @@ module.exports = {
         points: 0,
         table_id: 1,
         email: 'samee@vt.edu',
+        hand: null,
+        isTurn: false,
+        isDone: false,
+        ranking: '',
+        previousRanking: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -20,6 +25,11 @@ module.exports = {
         points: 0,
         table_id: 1,
         email: 'test@testing.com',
+        hand: null,
+        isTurn: false,
+        isDone: false,
+        ranking: '',
+        previousRanking: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -30,6 +40,11 @@ module.exports = {
         points: 0,
         table_id: 1,
         email: 'schmitty@test.com',
+        hand: null,
+        isTurn: false,
+        isDone: false,
+        ranking: '',
+        previousRanking: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -40,6 +55,11 @@ module.exports = {
         points: 0,
         table_id: 1,
         email: 'troll@test.com',
+        hand: null,
+        isTurn: false,
+        isDone: false,
+        ranking: '',
+        previousRanking: '',
         createdAt: new Date(),
         updatedAt: new Date()
       }

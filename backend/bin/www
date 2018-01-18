@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// TODO: MOVE TO A NEW INDEX.JS FILE
 
 /**
  * Module dependencies.
@@ -9,6 +10,7 @@ var debug = require('debug')('backend:server');
 var http = require('http');
 const cards = require('./../cards');
 const db    = require('./../models');
+
 /**
  * Get port from environment and store in Express.
  */
@@ -59,17 +61,18 @@ io.on('connection', (socket) => {
         username: player,
         previousRanking: '',
         ranking: '',
-        number: index,
         hand: {
           cards:[]
         },
         isTurn: false,
-        isDone: false,
-        hasScummedOut: false
+        isDone: false
       }
       return obj;
     })
     players = cards.dealRandomly(deck, players)
+    players.map(player=>{
+      updatePlayer(player)
+    })
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('start_next_game', (players, table_id) => {
@@ -141,7 +144,10 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
     played_cards.push(played_card);
+    // update player's hand in DB
+    updatePlayer(players[playerIndex].hand, players[playerIndex].username)
     checkIfPlayerIsDone(players,playerIndex, played_card);
+    // changes playerIndex as a side effect!
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     io.to(table_id).emit('play_card_complete', players, played_cards);
     if(players.filter(player=>player.isDone).length === players.length){
@@ -392,6 +398,37 @@ function findPileInPiles(allPiles, searchTerm, property1, property2){
     if (propertyCombo === searchTerm) return i;
   }
   return -1;
+}
+/*
+WRITE TO THE DATABASE
+*/
+function updatePlayer(player){
+  let hand = JSON.stringify(player.hand)
+  db.player.update({
+    hand: hand,
+    isTurn: player.isTurn,
+    isDone: player.isDone,
+    ranking: player.ranking,
+    previousRanking: player.previousRanking
+  },{
+    where: {
+      username: player.username
+    }
+  }).then(player=>console.log(player))
+  .catch(err=>console.log(err))
+}
+function updatePlayersInGame(players, playedCards, table_id){
+  players = JSON.stringify(players)
+  playedCards = playedCards ? JSON.stringify(playedCards) : null;
+  db.table.update({
+    players: players,
+    playedCards: playedCards
+  },{
+    where: {
+      id: table_id
+    }
+  }).then(table=>console.log(table))
+  .catch(err=>console.log(err))
 }
 
 server.on('error', onError);

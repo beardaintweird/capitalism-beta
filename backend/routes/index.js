@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 /*
 ==========PLAYER ROUTES==========
 */
-// get player
+// get player via email
 router.get('/player/:email', (req,res,next) => {
   db.player.findAll({
     where: {
@@ -19,6 +19,20 @@ router.get('/player/:email', (req,res,next) => {
   })
     .then((player) => {
       res.json(player)
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
+})
+// get player via username
+router.get('/player/:username', (req,res,next) => {
+  db.player.findAll({
+    where: {
+      username: req.params.username
+    }
+  })
+    .then((player) => {
+      res.status(200).json(player)
     }).catch(err=>{
       console.log(err);
       res.status(500)
@@ -92,7 +106,37 @@ router.post('/games_played', (req,res,next) => {
 /*
 ==========TABLE ROUTES==========
 */
-
+// Get tables
+router.get('/table', (req,res,next) => {
+  db.table.findAll({
+    include: [{
+      model: db.player
+    }]
+  })
+    .then((tables) => {
+      console.log(tables);
+      res.json(tables)
+    }).catch(err=>{
+      console.log(err);
+      res.status(500)
+    })
+})
+// Get one table
+router.get('/table/:id', (req,res,next) => {
+  db.table.findById(req.params.id, {
+    include: [{
+      model: db.player,
+      attributes: ['username',
+        'hand','isTurn','isDone','ranking','previousRanking']
+    }]
+  })
+  .then((table) => {
+    res.json(table)
+  }).catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
+})
 // Add table
 router.post('/table', (req,res,next) => {
   /*
@@ -159,6 +203,31 @@ router.post('/table/addPlayer', (req,res,next) => {
       res.status(500)
     })
 })
+// update game_underway
+router.post('/table/game_underway', (req,res,next) => {
+  /*
+  Request format:
+  {
+    "table_id": 1234,
+    "game_underway": true/false
+  }
+  */
+  console.log(req.body);
+  db.table.update({game_underway: req.body.game_underway},{
+    where: {
+      "id":req.body.table_id
+    }
+  })
+  .then((result) => {
+    console.log('UPDATE /table/game_underway',result);
+    res.status(200).json('game_underway updated successfully')
+  })
+  .catch(err=>{
+    console.log(err);
+    res.status(500)
+  })
+})
+
 // leave table
 router.post('/table/leave', (req,res,next) => {
   /*
@@ -195,30 +264,6 @@ router.post('/table/leave', (req,res,next) => {
     res.status(500)
   })
 })
-// Get tables
-router.get('/table', (req,res,next) => {
-  db.table.findAll({
-    include: [{
-      model: db.player
-    }]
-  })
-    .then((tables) => {
-      console.log(tables);
-      res.json(tables)
-    }).catch(err=>{
-      console.log(err);
-      res.status(500)
-    })
-})
-// Get one table
-router.get('/table/:id', (req,res,next) => {
-  db.table.findById(req.params.id)
-  .then((table) => {
-    res.json(table)
-  }).catch(err=>{
-    console.log(err);
-    res.status(500)
-  })
-})
+
 
 module.exports = router;
