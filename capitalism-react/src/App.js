@@ -138,6 +138,7 @@ class App extends Component {
                       hand={this.state.hand}
                       joinRoom={this.joinRoom}
                       table_id={this.state.table_id}
+                      username={this.state.username}
                        />
                   )
               }

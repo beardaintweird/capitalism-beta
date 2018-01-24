@@ -44,8 +44,8 @@ import React, {Component} from 'react';
           },
           body: JSON.stringify({
             table_id: result.id,
-            player: localStorage.getItem('username'),
-            player_id: localStorage.getItem('id')
+            player: this.props.username,
+            player_id: this.props.id
           })
         }
         return fetch('http://localhost:3000/table/addPlayer', options)

@@ -4,7 +4,7 @@ module.exports = {
     .then(res=>res.json())
   },
   getUserViaUsername(username){
-    
+
   },
   createUser(first_name, last_name, username, email){
     const options = {
@@ -26,11 +26,6 @@ module.exports = {
     .then(res=>res.json())
     .then(result=> {
       console.log(result);
-      for(let key in result){
-        localStorage.setItem(key, result[key]);
-        console.log(key,result[key]);
-      }
-      // localStorage.setItem('user', result)
     })
   },
   updateGameUnderway(table_id,game_underway){

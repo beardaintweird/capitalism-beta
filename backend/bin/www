@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('joinTable', (table_id) => {
     socket.join(table_id)
-    console.log('sockets joining table :D');
+    console.log('sockets joining table :D', io.sockets.adapter.rooms[table_id]);
     io.to(table_id).emit('table_joined')
   })
   /*
@@ -70,9 +70,9 @@ io.on('connection', (socket) => {
       return obj;
     })
     players = cards.dealRandomly(deck, players)
-    players.map(player=>{
-      updatePlayer(player)
-    })
+    // players.map(player=>{
+    //   updatePlayer(player)
+    // })
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('start_next_game', (players, table_id) => {
@@ -84,6 +84,7 @@ io.on('connection', (socket) => {
       player.isDone = false;
       if(player.ranking==='President') player.isTurn = true;
       else player.isTurn = false;
+      // updatePlayer(player)
       return player;
     })
     io.to(table_id).emit('start_pile_selection', players, piles)
@@ -96,6 +97,7 @@ io.on('connection', (socket) => {
     // sort the pile here
     selectedPile.cards.sort((a,b) => a.rank - b.rank);
     players[playerIndex].hand = selectedPile;
+    // updatePlayer(players[playerIndex])
     players = changeTurnsForPileSelection(players, playerIndex);
     if(!allPiles.length){
       players = tradeCards(players);
@@ -144,11 +146,11 @@ io.on('connection', (socket) => {
     let cardIndex = arrayObjectIndexOfTwo(players[playerIndex].hand.cards, searchTerm, 'title', 'suit');
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
     played_cards.push(played_card);
-    // update player's hand in DB
-    updatePlayer(players[playerIndex].hand, players[playerIndex].username)
+
     checkIfPlayerIsDone(players,playerIndex, played_card);
-    // changes playerIndex as a side effect!
+    // does NOT change playerIndex as a side effect
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('play_card_complete', players, played_cards);
     if(players.filter(player=>player.isDone).length === players.length){
       io.to(table_id).emit('clear')
@@ -164,6 +166,7 @@ io.on('connection', (socket) => {
     let played_card = players[playerIndex].hand.cards.splice(cardIndex,1);
     played_cards = [];
     checkIfPlayerIsDone(players, playerIndex, played_card);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('bomb_complete', players)
     io.to(table_id).emit('clear')
   })
@@ -184,6 +187,7 @@ io.on('connection', (socket) => {
     console.log('played cards', played_cards, 'hand', players[playerIndex].hand.cards);
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('play_doubles_complete', players, played_cards);
   })
   socket.on('play_triples', (players, cards, username, played_cards, table_id) => {
@@ -201,6 +205,7 @@ io.on('connection', (socket) => {
     }
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('play_triples_complete', players, played_cards);
   })
   socket.on('auto_complete', (players, cards, username, played_cards, table_id) => {
@@ -217,6 +222,7 @@ io.on('connection', (socket) => {
     }
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurnsForCompletion(players, playerIndex);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('play_auto_complete', players, played_cards);
     io.to(table_id).emit('clear')
   })
@@ -232,6 +238,7 @@ io.on('connection', (socket) => {
     }
     checkIfPlayerIsDone(players,playerIndex, null);
     changeTurnsForCompletion(players, playerIndex);
+    // updatePlayer(players[playerIndex])
     io.to(table_id).emit('completion_complete', players)
     io.to(table_id).emit('clear')
   })
@@ -246,13 +253,8 @@ function shouldSkip(card, played_cards){
   return card.rank === played_cards[played_cards.length - 2].rank;
 }
 function changeTurns(players, index, shouldSkip, table_id){
-  let donePlayers = players.filter((player) => {
-    return player.isDone;
-  })
-  if(donePlayers.length === players.length){
-    return;
-  }
-  players[index].isTurn = false;
+  if(players.filter(player => player.isDone).length === players.length) return
+  players[index].isTurn = false
   index = index === players.length - 1 ? 0 : ++index;
   while(players[index].isDone){
     index = index === players.length - 1 ? 0 : ++index;
@@ -263,10 +265,12 @@ function changeTurns(players, index, shouldSkip, table_id){
     changeTurns(players, index, false, null);
     io.to(table_id).emit('skip');
   }
+  // updatePlayer(players[playerIndex])
 }
 // made for 4 players
 function changeTurnsForPileSelection(players, playerIndex){
   players[playerIndex].isTurn = false;
+  // updatePlayer(players[playerIndex])
   function setNextTurn(players, ranking){
     return players.map(player=>{
       if(player.ranking === ranking) player.isTurn = true
@@ -374,6 +378,7 @@ function addCards(players, cards, ranking){
       for(let i = 0; i < cards.length; i++)
         player.hand.cards.push(cards[i])
     }
+    // updatePlayer(player)
     return player
   })
 }
