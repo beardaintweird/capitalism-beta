@@ -135,6 +135,7 @@ io.on('connection', (socket) => {
     if(played_cards.length > 1
         && players[playerIndex].username === played_cards[played_cards.length - 1].username){
       played_cards = []
+      updatePlayedCards(played_cards,table_id)
     }
     io.to(table_id).emit('pass_complete', players, played_cards);
   })
@@ -151,6 +152,7 @@ io.on('connection', (socket) => {
     // does NOT change playerIndex as a side effect
     changeTurns(players, playerIndex, shouldSkip(card,played_cards), table_id);
     updatePlayer(players[playerIndex])
+    updatePlayedCards(played_cards,table_id)
     io.to(table_id).emit('play_card_complete', players, played_cards);
     if(players.filter(player=>player.isDone).length === players.length){
       io.to(table_id).emit('clear')
@@ -167,6 +169,7 @@ io.on('connection', (socket) => {
     played_cards = [];
     checkIfPlayerIsDone(players, playerIndex, played_card);
     updatePlayer(players[playerIndex])
+    updatePlayedCards(played_cards,table_id)
     io.to(table_id).emit('bomb_complete', players)
     io.to(table_id).emit('clear')
   })
@@ -188,6 +191,7 @@ io.on('connection', (socket) => {
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
     updatePlayer(players[playerIndex])
+    updatePlayedCards(played_cards,table_id)
     io.to(table_id).emit('play_doubles_complete', players, played_cards);
   })
   socket.on('play_triples', (players, cards, username, played_cards, table_id) => {
@@ -206,6 +210,7 @@ io.on('connection', (socket) => {
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurns(players, playerIndex, false, table_id);
     updatePlayer(players[playerIndex])
+    updatePlayedCards(played_cards,table_id)
     io.to(table_id).emit('play_triples_complete', players, played_cards);
   })
   socket.on('auto_complete', (players, cards, username, played_cards, table_id) => {
@@ -220,9 +225,11 @@ io.on('connection', (socket) => {
       played_card = players[playerIndex].hand.cards.splice(cardIndex,1)[0];
       played_cards.push(played_card);
     }
+
     checkIfPlayerIsDone(players, playerIndex, played_card);
     changeTurnsForCompletion(players, playerIndex);
     updatePlayer(players[playerIndex])
+    updatePlayedCards([],table_id)
     io.to(table_id).emit('play_auto_complete', players, played_cards);
     io.to(table_id).emit('clear')
   })
@@ -239,6 +246,7 @@ io.on('connection', (socket) => {
     checkIfPlayerIsDone(players,playerIndex, null);
     changeTurnsForCompletion(players, playerIndex);
     updatePlayer(players[playerIndex])
+    updatePlayedCards([],table_id)
     io.to(table_id).emit('completion_complete', players)
     io.to(table_id).emit('clear')
   })
@@ -265,7 +273,7 @@ function changeTurns(players, index, shouldSkip, table_id){
     changeTurns(players, index, false, null);
     io.to(table_id).emit('skip');
   }
-  updatePlayer(players[playerIndex])
+  updatePlayer(players[index])
 }
 // made for 4 players
 function changeTurnsForPileSelection(players, playerIndex){
@@ -423,11 +431,9 @@ function updatePlayer(player){
   }).then(player=>console.log(player))
   .catch(err=>console.log(err))
 }
-function updatePlayersInGame(players, playedCards, table_id){
-  players = JSON.stringify(players)
-  playedCards = playedCards ? JSON.stringify(playedCards) : null;
+function updatePlayedCards(playedCards, table_id){
+  playedCards = JSON.stringify(playedCards)
   db.table.update({
-    players: players,
     playedCards: playedCards
   },{
     where: {

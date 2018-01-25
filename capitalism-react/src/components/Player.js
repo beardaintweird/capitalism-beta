@@ -12,7 +12,7 @@ class Player extends Component {
  render() {
    let name;
    if(this.props.isTurn) {
-     console.log(`It's ${this.props.username}'s turn`);
+     // console.log(`It's ${this.props.username}'s turn`);
      name = (<p className="active">{this.props.username}</p>)
    } else {
      name = (<p className="inactive">{this.props.username}</p>)

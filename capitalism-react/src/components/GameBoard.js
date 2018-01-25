@@ -119,7 +119,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('game_finished', () => {
       this.setState({game_underway: false})
-      console.log('Game finished!! ');
+      console.log('Game finished!!');
       if(this.state.this_player.isTurn)
         this.props.socket.emit('start_next_game', this.state.players, this.props.table_id)
     })
@@ -136,10 +136,12 @@ class GameBoard extends Component {
       getTablePlayers(this.props.table_id)
         .then(table=>{
           table.players = table.players.map(player=>{
-            player.hand= JSON.parse(player.hand)
+            player.hand = JSON.parse(player.hand)
             return player
           })
           this.updatePlayer(table.players)
+          if(table.playedCards)
+            this.updatePlayedCards(JSON.parse(table.playedCards),false)
         })
 
     }
@@ -154,7 +156,7 @@ class GameBoard extends Component {
 
         if(result.game_underway && !this.state.players.length){
           // update the current player's state
-          console.log('player needs to have his info updated!');
+          console.log('player needs to have his info updated! ');
         }
       })
     }
@@ -167,7 +169,6 @@ class GameBoard extends Component {
   }
   updatePlayer(players, callback){
     this.setState({players: players}, () => {
-      console.log(players);
       let this_player = this.state.players.filter((player) => {
         return player.username === this.props.username
       })[0];
@@ -287,6 +288,7 @@ class GameBoard extends Component {
                   />)
       })
     }
+    console.log(this.state.played_cards);
     if(this.state.played_cards.length){
       topCard = this.state.played_cards[this.state.played_cards.length - 1]
     } else {
@@ -305,7 +307,6 @@ class GameBoard extends Component {
     }
     // when this.state.players is not empty, the game has started.
     // the startGameButton may cease to exist
-    console.log(this.props.username);
     if(this.state.playerNames[0] === this.props.username
       && !this.state.game_underway
     ){
