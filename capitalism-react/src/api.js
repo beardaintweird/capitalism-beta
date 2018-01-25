@@ -46,6 +46,10 @@ module.exports = {
       console.log('game_underway update result:',result);
     })
   },
+  getTablePlayers(table_id){
+    return fetch('http://localhost:3000/table/1')
+            .then(res=>res.json())
+  },
   objectKeys(){
     return {
       id:'id',

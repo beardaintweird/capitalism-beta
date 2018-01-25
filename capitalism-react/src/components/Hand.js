@@ -143,7 +143,7 @@ createDoublesTriplesAutos(){
    let cards;
    let specials;
    let pass;
-   if(this.props.hand.cards){
+   if(this.props.hand && this.props.hand.cards){
      cards = this.props.hand.cards.map((card) => {
        let enable = this.isLegalCardToPlay(card);
        if(card.image.substring(0,4) === 'img/'){

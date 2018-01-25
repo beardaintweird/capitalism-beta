@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './GameBoard.css';
-import { updateGameUnderway, getUser } from '../api';
+import { updateGameUnderway, getUser, getTablePlayers } from '../api';
 
 import Hand from './Hand';
 import Player from './Player';
@@ -42,6 +42,7 @@ class GameBoard extends Component {
 
   }
   componentDidMount(){
+
     /*
     ==================================================
     GAME ADMINISTRATION FUNCTIONALITY
@@ -67,7 +68,6 @@ class GameBoard extends Component {
         // }
       }
     );
-    console.log(allPiles);
       this.setState({piles: allPiles})
     })
     /*
@@ -132,11 +132,21 @@ class GameBoard extends Component {
     })
   }
   componentDidUpdate(){
+    if(this.props.table_id > 0 && !this.state.players.length){
+      getTablePlayers(this.props.table_id)
+        .then(table=>{
+          table.players = table.players.map(player=>{
+            player.hand= JSON.parse(player.hand)
+            return player
+          })
+          this.updatePlayer(table.players)
+        })
+
+    }
     if(this.props.table_id > 0 && !this.state.playerNames.length){
       fetch(`http://localhost:3000/table/${this.props.table_id}`)
       .then(res=>res.json())
       .then((result) => {
-        console.log('table',result);
         this.setState({
           playerNames: result.playerNames,
           game_underway: result.game_underway
@@ -163,7 +173,7 @@ class GameBoard extends Component {
       })[0];
       if(this_player){
         this.setState({hand:this_player.hand}, () => {
-          if(this.state.game_underway && this.state.hand.cards.length === 0){
+          if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0){
             console.log('Done!');
           }
         })
@@ -253,7 +263,7 @@ class GameBoard extends Component {
     let completion;
     let pileSelection;
     let startGameButton;
-    this.state.players.length ? console.log(this.state.players): null
+    // this.state.players.length ? console.log(this.state.players): null
 
     if(!this.state.playerJoinedTable && this.props.table_id !== 'null'){
       this.props.joinRoom(this.props.table_id)
@@ -296,8 +306,7 @@ class GameBoard extends Component {
     // when this.state.players is not empty, the game has started.
     // the startGameButton may cease to exist
     console.log(this.props.username);
-    if(!this.state.players.length
-      && this.state.playerNames[0] === this.props.username
+    if(this.state.playerNames[0] === this.props.username
       && !this.state.game_underway
     ){
       startGameButton = (<button onClick={this.startGame}>Start Game</button>)
