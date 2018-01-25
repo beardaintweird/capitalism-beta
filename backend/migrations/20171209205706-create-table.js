@@ -26,6 +26,12 @@ module.exports = {
       playedCards: {
         type: Sequelize.JSON
       },
+      isDoublesOnly: {
+        type: Sequelize.BOOLEAN
+      },
+      isTriplesOnly: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

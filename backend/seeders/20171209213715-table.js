@@ -9,6 +9,8 @@ module.exports = {
       game_underway: false,
       playersInGame: null,
       playedCards: null,
+      isDoublesOnly: false,
+      isTriplesOnly: false,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

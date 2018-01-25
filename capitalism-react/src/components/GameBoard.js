@@ -142,24 +142,15 @@ class GameBoard extends Component {
           this.updatePlayer(table.players)
           if(table.playedCards)
             this.updatePlayedCards(JSON.parse(table.playedCards),false)
+          this.updateDoublesAndTriples(table.isDoublesOnly,table.isTriplesOnly)
         })
-
     }
-    if(this.props.table_id > 0 && !this.state.playerNames.length){
-      fetch(`http://localhost:3000/table/${this.props.table_id}`)
-      .then(res=>res.json())
-      .then((result) => {
-        this.setState({
-          playerNames: result.playerNames,
-          game_underway: result.game_underway
-        })
-
-        if(result.game_underway && !this.state.players.length){
-          // update the current player's state
-          console.log('player needs to have his info updated! ');
-        }
-      })
-    }
+  }
+  updateDoublesAndTriples = (bool1,bool2) => {
+    this.setState({
+      isDoublesOnly: bool1,
+      isTriplesOnly: bool2
+    })
   }
   updatePlayedCards(played_cards, autoComplete){
     this.setState({played_cards}, () => {
@@ -168,22 +159,31 @@ class GameBoard extends Component {
     })
   }
   updatePlayer(players, callback){
-    this.setState({players: players}, () => {
-      let this_player = this.state.players.filter((player) => {
-        return player.username === this.props.username
-      })[0];
-      if(this_player){
-        this.setState({hand:this_player.hand}, () => {
-          if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0){
-            console.log('Done!');
-          }
-        })
-        this.setState({this_player: this_player})
-      }
-      if(callback){
-        callback();
-      }
-    })
+    let playerNames = []
+    let this_player = players.filter((player) => {
+      playerNames.push(player.username)
+      return player.username === this.props.username
+    })[0];
+    if(!this.state.playerNames.length){
+      this.setState({
+        players: players,
+        this_player:this_player,
+        hand: this_player.hand,
+        playerNames: playerNames
+      }, () => {
+        if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0)
+          console.log('Done!');
+      })
+    } else {
+      this.setState({
+        players: players,
+        this_player:this_player,
+        hand: this_player.hand
+      }, () => {
+        if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0)
+          console.log('Done!');
+      })
+    }
   }
   startGame(e){
     let players = this.state.players.length ? this.state.players : this.state.playerNames
@@ -264,7 +264,7 @@ class GameBoard extends Component {
     let completion;
     let pileSelection;
     let startGameButton;
-    // this.state.players.length ? console.log(this.state.players): null
+    this.state.players.length ? console.log(this.state.players ): null
 
     if(!this.state.playerJoinedTable && this.props.table_id !== 'null'){
       this.props.joinRoom(this.props.table_id)
@@ -288,7 +288,7 @@ class GameBoard extends Component {
                   />)
       })
     }
-    console.log(this.state.played_cards);
+    console.log(this.state.played_cards, '');
     if(this.state.played_cards.length){
       topCard = this.state.played_cards[this.state.played_cards.length - 1]
     } else {
@@ -307,6 +307,7 @@ class GameBoard extends Component {
     }
     // when this.state.players is not empty, the game has started.
     // the startGameButton may cease to exist
+    console.log(this.state.playerNames[0],this.props.username);
     if(this.state.playerNames[0] === this.props.username
       && !this.state.game_underway
     ){
