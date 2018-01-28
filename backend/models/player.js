@@ -2,15 +2,16 @@
 module.exports = (sequelize, DataTypes) => {
   var player = sequelize.define('player', {
     name: DataTypes.STRING,
-    username: DataTypes.STRING,
-    games_played: DataTypes.INTEGER,
-    email: DataTypes.STRING,
-    points: DataTypes.INTEGER,
-    table_id: DataTypes.INTEGER,
     hand: DataTypes.JSON,
+    email: DataTypes.STRING,
+    timer: DataTypes.INTEGER,
+    points: DataTypes.INTEGER,
     isTurn: DataTypes.BOOLEAN,
     isDone: DataTypes.BOOLEAN,
     ranking: DataTypes.STRING,
+    username: DataTypes.STRING,
+    table_id: DataTypes.INTEGER,
+    games_played: DataTypes.INTEGER,
     previousRanking: DataTypes.STRING
   },{
     freezeTableName: true

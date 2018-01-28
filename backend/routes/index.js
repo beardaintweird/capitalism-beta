@@ -126,7 +126,7 @@ router.get('/table/:id', (req,res,next) => {
     include: [{
       model: db.player,
       attributes: ['username',
-        'hand','isTurn','isDone','ranking','previousRanking']
+        'hand','isTurn','isDone','ranking','previousRanking','timer','id']
     }]
   })
   .then((table) => {

@@ -17,11 +17,11 @@ class GameBoard extends Component {
     this.state = {
       hand: [],
       piles: [],
+      timer: -1,
       players: [],
       this_player: {},
       playerNames: [],
       played_cards: [],
-      table_id: 'null',
       game_underway: false,
       isDoublesOnly: false,
       isTriplesOnly: false,
@@ -61,6 +61,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('cards_dealt', (players) => {
       this.updatePlayer(players);
+      this.setState({'game_underway': true})
     })
     this.props.socket.on('start_pile_selection', (players, piles) => {
       this.updatePlayer(players);
@@ -72,17 +73,32 @@ class GameBoard extends Component {
         game_underway: game_underway
       }))
     })
+    this.props.socket.on('game_ended', (players) => {
+      this.updatePlayer(players)
+      this.setState({
+        game_underway: false,
+        played_cards: []
+      })
+    })
     /*
     ==================================================
     GAMEPLAY FUNCTIONALITY
     ==================================================
     */
+    this.props.socket.on('timer_update', (newTime, player) => {
+      if(this.state.this_player.username === player.username)
+        this.setState({timer: newTime}, () => {
+          if(this.state.timer === -1){
+            this.pass();
+          }
+        })
+    })
     this.props.socket.on('pass_complete', (players, played_cards) => {
       console.log('pass_complete received from server.');
       this.updatePlayer(players, this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('play_card_complete', (players, played_cards) => {
-      console.log('play_card_complete received from server.');
+      console.log('play_card_complete received from server. ');
       this.updatePlayer(players,this.updatePlayedCards(played_cards))
     })
     this.props.socket.on('skip', () => {
@@ -95,7 +111,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_doubles_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('doubles! ');
+      console.log('doubles!');
       this.setState({
         isDoublesOnly: true
       }, () => {
@@ -112,7 +128,7 @@ class GameBoard extends Component {
     })
     this.props.socket.on('play_auto_complete', (players, played_cards) => {
       // Making separate socket event in case of future animation or other functionality
-      console.log('Auto complete!');
+      console.log('Auto complete! ');
       this.updatePlayer(players)
       this.updatePlayedCards(played_cards, true);
     })
@@ -135,13 +151,13 @@ class GameBoard extends Component {
   }
   componentDidUpdate(){
     if(this.props.table_id > 0 && !this.state.players.length){
-      console.log(this.props.table_id);
       getTablePlayers(this.props.table_id)
         .then(table=>{
           table.players = table.players.map(player=>{
             player.hand = JSON.parse(player.hand)
             return player
           })
+          console.log(table);
           this.updatePlayer(table.players)
           if(table.playedCards)
             this.updatePlayedCards(JSON.parse(table.playedCards),false)
@@ -168,24 +184,35 @@ class GameBoard extends Component {
       playerNames.push(player.username)
       return player.username === this.props.username
     })[0];
+    console.log(this_player.timer, players);
     if(!this.state.playerNames.length){
       this.setState({
         players: players,
         this_player:this_player,
         hand: this_player.hand,
-        playerNames: playerNames
+        playerNames: playerNames,
+        timer: this_player.timer
       }, () => {
+        // when a player refreshes
+        if(this.state.this_player.isTurn && this.state.game_underway){
+          this.props.socket.emit('resume_timer', this.state.players, this.state.this_player, this.props.table_id)
+        }
         if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0)
           console.log('Done!');
       })
     } else {
+      // normal update
       this.setState({
         players: players,
         this_player:this_player,
         hand: this_player.hand
       }, () => {
+        console.log(this.state.this_player.isTurn, this.state.game_underway);
+        if(this.state.this_player.isTurn && this.state.game_underway){
+          this.props.socket.emit('resume_timer', this.state.players, this.state.this_player, this.props.table_id)
+        }
         if(this.state.game_underway && this.state.hand && this.state.hand.cards.length === 0)
-          console.log('Done!');
+          console.log('Done! ');
       })
     }
   }
@@ -194,6 +221,10 @@ class GameBoard extends Component {
     this.props.socket.emit('startGame', players, this.props.table_id)
     this.setState({game_underway: true})
     updateGameUnderway(this.props.table_id, true);
+  }
+  endGame = ()=>{
+    // end game
+    this.props.socket.emit('end_game', this.state.players, this.props.table_id)
   }
   selectPile(pile, allPiles){
     this.props.socket.emit('select_pile', this.state.players, this.state.this_player.username, pile, allPiles, this.props.table_id)
@@ -237,7 +268,7 @@ class GameBoard extends Component {
     this.props.socket.emit('play_completion', this.state.players, cards, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   checkForCompletions(){
-    if(!this.state.played_cards.length){
+    if(!this.state.played_cards.length || !this.state.hand){
       return null;
     }
     let length = this.state.played_cards.length;
@@ -263,12 +294,21 @@ class GameBoard extends Component {
     }
   }
   render() {
+    let timer;
     let topCard;
     let players;
     let completion;
     let pileSelection;
-    let startGameButton;
+    let gameButton;
     let needMorePlayersMessage;
+
+    // start the timer
+    if(this.state.this_player.isTurn){
+      if(this.state.timer > 0)
+        timer = (<p className="timer">{this.state.timer}</p>)
+    } else {
+      timer = (<p>Not your turn</p>)
+    }
 
     // joining the socket room if not already joined
     if(!this.state.playerJoinedTable && this.props.table_id !== 'null'){
@@ -312,11 +352,13 @@ class GameBoard extends Component {
       && !this.state.game_underway
       && this.state.players.length > 3
     ){
-      startGameButton = (<button onClick={this.startGame}>Start Game</button>)
+      gameButton = (<button onClick={this.startGame}>Start Game</button>)
     } else if(!this.state.game_underway) {
       needMorePlayersMessage = (<p>Need {4 - this.state.players.length} more player(s) to start the game...</p>)
+    } else if (this.state.game_underway){
+      gameButton = (<button onClick={this.endGame}>End Game</button>)
     }
-    
+
     // for piles when the first round is over
     if(this.state.piles.length && !this.state.game_underway){
       pileSelection = (
@@ -329,6 +371,7 @@ class GameBoard extends Component {
       <div className="container">
         <div className="row">
           {players}
+          {timer}
         </div>
         <div className="row"><PlayedCards cards={this.state.played_cards} /></div>
         {pileSelection}
@@ -349,7 +392,7 @@ class GameBoard extends Component {
             />
         </div>
         <div className="row">
-          {startGameButton}
+          {gameButton}
           {needMorePlayersMessage}
         </div>
       </div>

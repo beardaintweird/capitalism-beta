@@ -65,6 +65,9 @@ module.exports = {
     return fetch('http://localhost:3000/table/leave',options)
             .then(res=>res.json())
   },
+  updateTimer(player_id){
+
+  },
   objectKeys(){
     return {
       id:'id',

@@ -10,6 +10,7 @@ var debug = require('debug')('backend:server');
 var http = require('http');
 const cards = require('./../cards');
 const db    = require('./../models');
+let interval;
 
 /**
  * Get port from environment and store in Express.
@@ -127,11 +128,38 @@ io.on('connection', (socket) => {
     })
     return players;
   }
+  socket.on('end_game', (players, table_id) => {
+    players = players.map((player) => {
+      player.isTurn = false
+      player.isDone = false
+      player.hand = null;
+      updatePlayer(player)
+      return player
+    })
+    clearInterval(interval)
+    updateGameUnderway(false, table_id)
+    updateIsDoublesOnly(false, table_id)
+    updateIsTriplesOnly(false,table_id)
+    updatePlayedCards([], table_id)
+    io.to(table_id).emit('game_ended', players)
+  })
   /*
   ==================================================
   GAMEPLAY FUNCTIONALITY
   ==================================================
   */
+  socket.on('resume_timer', (players, this_player, table_id) => {
+    console.log('IN RESUME TIMER');
+    let newTime = this_player.timer === -1 ? 10 : this_player.timer - 1
+    let playerIndex = arrayObjectIndexOf(players, this_player.username, 'username');
+    if(interval) clearInterval(interval)
+    interval = setInterval(() => {
+      if(newTime === -1) clearInterval(interval)
+      io.to(table_id).emit('timer_update', newTime, this_player)
+      updatePlayerTimer(newTime,this_player.id, players, playerIndex)
+      newTime--;
+    }, 1000)
+  })
   socket.on('pass', (players, username, played_cards, table_id) => {
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     changeTurns(players, playerIndex);
@@ -281,7 +309,7 @@ function changeTurns(players, index, shouldSkip, table_id){
   if(shouldSkip){
     console.log('skipping player');
     changeTurns(players, index, false, null);
-    io.to(table_id).emit('skip');
+    io.to(table_id).emit('skip', players[index]);
   }
   updatePlayer(players[index])
 }
@@ -401,6 +429,7 @@ function addCards(players, cards, ranking){
   })
 }
 
+
 // helper functions
 function arrayObjectIndexOf(myArray, searchTerm, property) {
     for(var i = 0, len = myArray.length; i < len; i++) {
@@ -427,7 +456,6 @@ WRITE TO THE DATABASE
 */
 function updatePlayer(player){
   let hand = JSON.stringify(player.hand)
-  console.log(player);
   db.player.update({
     hand: hand,
     isTurn: player.isTurn,
@@ -436,10 +464,23 @@ function updatePlayer(player){
     previousRanking: player.previousRanking
   },{
     where: {
-      username: player.username
+      'id': player.id
     }
   }).then(player=>console.log(player))
   .catch(err=>console.log(err))
+}
+function updatePlayerTimer(newTime,player_id, players, playerIndex){
+  db.player.update({
+    timer: newTime
+  },{
+    where: {
+      'id':player_id
+    }
+  }).then((result) => {
+    // how will the client know which player's timer is being updated?
+    players[playerIndex].timer = newTime
+    console.log('result of updating timer:',result)
+  }).catch(err=>console.log(err))
 }
 function updatePlayedCards(playedCards, table_id){
   playedCards = JSON.stringify(playedCards)

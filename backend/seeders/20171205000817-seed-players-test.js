@@ -15,6 +15,7 @@ module.exports = {
         isDone: false,
         ranking: '',
         previousRanking: '',
+        timer: -1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -30,6 +31,7 @@ module.exports = {
         isDone: false,
         ranking: '',
         previousRanking: '',
+        timer: -1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -45,6 +47,7 @@ module.exports = {
         isDone: false,
         ranking: '',
         previousRanking: '',
+        timer: -1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -60,6 +63,7 @@ module.exports = {
         isDone: false,
         ranking: '',
         previousRanking: '',
+        timer: -1,
         createdAt: new Date(),
         updatedAt: new Date()
       }

@@ -4,9 +4,6 @@ import './Player.css';
 class Player extends Component {
  constructor(props){
    super(props);
-   this.state = {
-     timer: -1
-   }
  }
  componentDidMount(){
 
@@ -14,10 +11,6 @@ class Player extends Component {
  render() {
    let name;
    if(this.props.isTurn) {
-     // if(this.state.timer < 0){
-     //  this.setState({timer: 15}) 
-     // }
-
      // console.log(`It's ${this.props.username}'s turn`);
      name = (<p className="active">{this.props.username}</p>)
    } else {

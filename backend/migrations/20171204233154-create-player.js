@@ -41,6 +41,9 @@ module.exports = {
       previousRanking: {
         type: Sequelize.STRING
       },
+      timer: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
