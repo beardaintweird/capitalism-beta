@@ -73,6 +73,7 @@ io.on('connection', (socket) => {
     players.map(player=>{
       updatePlayer(player)
     })
+    updateGameUnderway(true,table_id)
     io.to(table_id).emit('cards_dealt', players)
   })
   socket.on('start_next_game', (players, table_id) => {
@@ -90,6 +91,7 @@ io.on('connection', (socket) => {
     io.to(table_id).emit('start_pile_selection', players, piles)
   })
   socket.on('select_pile', (players, username, pile, allPiles, table_id) => {
+    let game_underway = false;
     let searchTerm = pile.cards[0].title + '' + pile.cards[0].suit;
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     let pileIndex = findPileInPiles(allPiles, searchTerm, 'title', 'suit');
@@ -101,8 +103,10 @@ io.on('connection', (socket) => {
     players = changeTurnsForPileSelection(players, playerIndex);
     if(!allPiles.length){
       players = tradeCards(players);
+      game_underway = true
+      updateGameUnderway(true,table_id)
     }
-    io.to(table_id).emit('pile_selected', players, allPiles);
+    io.to(table_id).emit('pile_selected', players, allPiles, game_underway)
   })
   function tradeCards(players){
     let scumOnesBestCards        = [];
@@ -157,6 +161,7 @@ io.on('connection', (socket) => {
     if(players.filter(player=>player.isDone).length === players.length){
       io.to(table_id).emit('clear')
       io.to(table_id).emit('game_finished')
+      updateGameUnderway(false,table_id)
     }
   })
   socket.on('bomb', (players, card, username, played_cards, table_id) => {
@@ -465,7 +470,15 @@ function updateIsTriplesOnly(bool,table_id){
   }).then(result=>console.log(result))
   .catch(err=>console.log(err))
 }
-
+function updateGameUnderway(bool,table_id){
+  db.table.update({game_underway:bool},
+  {
+    where: {
+      id: table_id
+    }
+  }).then(result=>console.log(result))
+  .catch(err=>console.log(err))
+}
 server.on('error', onError);
 server.on('listening', onListening);
 

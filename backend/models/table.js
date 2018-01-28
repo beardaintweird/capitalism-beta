@@ -4,11 +4,11 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     player_limit: DataTypes.INTEGER,
     playerNames: DataTypes.ARRAY(DataTypes.STRING),
-    game_underway: DataTypes.BOOLEAN,
-    playersInGame: DataTypes.JSON,
     playedCards: DataTypes.JSON,
+    playersInGame: DataTypes.JSON,
     isDoublesOnly: DataTypes.BOOLEAN,
-    isTriplesOnly: DataTypes.BOOLEAN
+    isTriplesOnly: DataTypes.BOOLEAN,
+    game_underway: DataTypes.BOOLEAN
   },{
     freezeTableName:true
   });

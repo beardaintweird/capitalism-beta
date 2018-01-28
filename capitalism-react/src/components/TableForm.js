@@ -20,7 +20,6 @@ import React, {Component} from 'react';
    }
    handleSubmit(e){
      // create table
-     console.log(this.state.table_name);
      let options = {
        method: 'POST',
        headers: {
@@ -34,8 +33,11 @@ import React, {Component} from 'react';
      fetch('http://localhost:3000/table', options)
       .then(res => res.json())
       .then((result) => {
-        console.log(result);
-        this.setState({table_id:result.id})
+        console.log('new table',result);
+        this.setState({
+          table_id:result.id,
+          table_name: ''
+        })
         let options = {
           method: 'POST',
           headers: {
@@ -44,7 +46,6 @@ import React, {Component} from 'react';
           },
           body: JSON.stringify({
             table_id: result.id,
-            player: this.props.username,
             player_id: this.props.id
           })
         }
@@ -53,8 +54,9 @@ import React, {Component} from 'react';
       .then(res=>res.json())
       .then((result_two) => {
         console.log(result_two);
-        this.props.joinRoom(this.state.table_id)
-        this.props.history.push(`/gameboard/${this.state.table_id}`)
+        this.props.updateTables(this.state.table_id)
+        // this.props.joinRoom(this.state.table_id)
+        // this.props.history.push(`/gameboard/${this.state.table_id}`)
       })
      e.preventDefault();
    }

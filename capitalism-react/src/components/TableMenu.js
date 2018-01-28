@@ -15,22 +15,26 @@ import { withRouter } from 'react-router-dom';
      }
    }
    componentDidMount(){
-     this.props.updateTables()
    }
    render() {
      let tables;
      let tableForm = this.props.isLoggedIn ?
-      (<TableForm joinRoom={this.props.joinRoom} socket={this.props.socket} />)
+      (<TableForm
+        joinRoom={this.props.joinRoom}
+        socket={this.props.socket}
+        updateTables={this.props.updateTables}
+        id={this.props.id} />)
       : '';
      if(this.props.tables){
        console.log('tableMenu tables',this.props.tables);
        tables = this.props.tables.map((table) => {
+         let playerNames = table.players.map(player=>player.username)
          return (
            <Table key={table.id}
            id={this.props.id}
            table_id={table.id}
            table_name={table.name}
-           players={table.playerNames}
+           players={playerNames}
            username={this.props.username}
            joinRoom={this.props.joinRoom}
            isLoggedIn={this.props.isLoggedIn}

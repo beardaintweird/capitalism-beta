@@ -18,7 +18,10 @@ class Nav extends Component {
  handleClick(e){
    // console.log(window.location.href.match(/gameboard/gim));
    if(window.location.href.match(/gameboard/gim)){
-     this.leaveTable();
+     window.alert('You\'re game is in progress. Lost your desire to be president?')
+     // if(window.confirm('Leaving the game board means')){
+     //   this.leaveTable()
+     // }
    }
  }
  logout(e){

@@ -47,7 +47,22 @@ module.exports = {
     })
   },
   getTablePlayers(table_id){
-    return fetch('http://localhost:3000/table/1')
+    return fetch('http://localhost:3000/table/'+table_id)
+            .then(res=>res.json())
+  },
+  leaveTable(player_id,table_id){
+    let options = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        player_id: player_id,
+        table_id: table_id
+      })
+    }
+    return fetch('http://localhost:3000/table/leave',options)
             .then(res=>res.json())
   },
   objectKeys(){

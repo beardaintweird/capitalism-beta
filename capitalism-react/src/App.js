@@ -44,6 +44,7 @@ class App extends Component {
   }
 
   componentDidMount(){
+    this.updateTables()
     auth.onAuthStateChanged((user) => {
       if(user){
         let userInfo = api.getUser(auth.currentUser.email).then((userInfo) => {
@@ -90,12 +91,15 @@ class App extends Component {
     })
     this.updateTables()
   }
-  updateTables(){
+  updateTables(id){
     fetch('http://localhost:3000/table')
     .then(res=>res.json())
     .then(result => {
       console.log('updating tables', result);
-      this.setState({ tables: result })
+      this.setState({
+        tables: result,
+        table_id: id ? id : this.state.table_id
+      })
     })
   }
 
