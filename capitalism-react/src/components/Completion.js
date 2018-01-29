@@ -17,7 +17,7 @@ class Completion extends Component {
  render() {
    let complete = '';
    if(this.props.enabled)
-    complete = (<button onClick={this.handleClick}>Complete the {this.props.title}s!</button>)
+    complete = (<button className="tableButtons special" onClick={this.handleClick}>Complete the {this.props.title}s!</button>)
    return (
      <div>
       {complete}

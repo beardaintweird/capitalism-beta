@@ -17,8 +17,8 @@ import React, {Component} from 'react';
      return (
        <div className="tableButtons">
         {this.props.isTurn && this.props.enabled ?
-          <button className="tableButtons" onClick={this.handleClick}>Auto complete {this.props.title}s</button>
-        : <button className="tableButtons" onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>}
+          <button className="tableButtons special" onClick={this.handleClick}>Auto complete {this.props.title}s</button>
+        : <button className="tableButtons special" onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>}
        </div>
      )
    }
