@@ -1,0 +1,16 @@
+#go {
+  margin-left: 0;
+}
+#leave {
+  margin-left: 10px;
+  margin-bottom: 1em;
+}
+.tableButtons {
+  border-radius: 5px;
+  padding: 0.2em 1em;
+}
+.table {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-bottom: 1em;
+}

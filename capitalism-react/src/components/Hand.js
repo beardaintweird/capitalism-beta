@@ -135,52 +135,59 @@ createDoublesTriplesAutos(){
   }
   return doublesTriplesAutos;
 }
- componentDidMount(){
-   let images = this.importAll(require.context('./../../public/img', false, /\.(png|jpe?g|svg)$/));
-   this.setState({images})
- }
- render() {
-   let cards;
-   let specials;
-   let pass;
-   if(this.props.hand && this.props.hand.cards){
-     cards = this.props.hand.cards.map((card) => {
-       let enable = this.isLegalCardToPlay(card);
-       if(card.image.substring(0,4) === 'img/'){
-         card.image = card.image.substring(4);
-       }
-       return (
-         <Card
-          key={card.title + card.suit}
-          data={card}
-          title={card.title}
-          rank={card.rank}
-          isBomb={card.isBomb}
-          suit={card.suit}
-          imageSrc={this.state.images[card.image]}
-          isTurn={this.props.isTurn}
-          playCard={this.props.playCard}
-          bomb={this.props.bomb}
-          enable={enable}
-          />
-       )
-     })
-     specials = this.createDoublesTriplesAutos();
-     if(this.props.isTurn && this.props.topCard){
-       pass = <button onClick={this.props.pass}>Pass</button>
-     } else {
-       pass = <button onClick={this.props.pass} disabled>Pass</button>
+componentDidMount(){
+ let images = this.importAll(require.context('./../../public/img', false, /\.(png|jpe?g|svg)$/));
+ this.setState({images})
+}
+render() {
+ let cards;
+ let specials;
+ let pass;
+ if(this.props.hand && this.props.hand.cards){
+   cards = this.props.hand.cards.map((card) => {
+     let enable = this.isLegalCardToPlay(card);
+     if(card.image.substring(0,4) === 'img/'){
+       card.image = card.image.substring(4);
      }
+     return (
+       <Card
+        key={card.title + card.suit}
+        data={card}
+        title={card.title}
+        rank={card.rank}
+        isBomb={card.isBomb}
+        suit={card.suit}
+        imageSrc={this.state.images[card.image]}
+        isTurn={this.props.isTurn}
+        playCard={this.props.playCard}
+        bomb={this.props.bomb}
+        enable={enable}
+        />
+     )
+   })
+   specials = this.createDoublesTriplesAutos();
+   if(this.props.isTurn && this.props.topCard){
+     pass = <button className="tableButtons" onClick={this.props.pass}>Pass</button>
+   } else {
+     pass = <button className="tableButtons" onClick={this.props.pass} disabled>Pass</button>
    }
-   return (
-     <div>
-      {cards}<br/>
-      {specials}<br/>
+ }
+ return (
+   <div className="row">
+    <div className="col s9">
+      {cards}
+    </div>
+    <div className="col s3">
+      {specials}
+    </div>
+    <div className="col s12">
       {this.props.completion}<br/>
       {pass}
-     </div>
-   )
- }
+    </div>
+
+   </div>
+ )
+}
 }
 
 export default Hand

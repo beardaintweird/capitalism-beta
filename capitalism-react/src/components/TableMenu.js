@@ -45,11 +45,11 @@ import { withRouter } from 'react-router-dom';
      return (
        <div className="container">
         <div className="row">
-          <div className="col s3"></div>
-          <div className="col s6">
-          {tableForm}
+          <div className="col s4">
+            {tableForm}
           </div>
-          <div className="col s3"></div>
+          <div className="col s8">
+          </div>
         </div>
         <div className="row">
           {tables}

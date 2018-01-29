@@ -15,10 +15,10 @@ import React, {Component} from 'react';
    }
   render() {
      return (
-       <div>
+       <div className="tableButtons">
         {this.props.isTurn && this.props.enabled ?
-          <button onClick={this.handleClick}>Auto complete {this.props.title}s</button>
-        : <button onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>}
+          <button className="tableButtons" onClick={this.handleClick}>Auto complete {this.props.title}s</button>
+        : <button className="tableButtons" onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>}
        </div>
      )
    }

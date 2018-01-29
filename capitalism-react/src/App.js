@@ -95,7 +95,6 @@ class App extends Component {
     fetch('http://localhost:3000/table')
     .then(res=>res.json())
     .then(result => {
-      console.log('updating tables', result);
       this.setState({
         tables: result,
         table_id: id ? id : this.state.table_id
@@ -106,17 +105,14 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Welcome to Caps</h1>
-        </header>
         <Router>
           <div>
-            <Nav
-              isLoggedIn={this.state.isLoggedIn}
-              id={this.state.id}
-              table_id={this.state.table_id}
-              username={this.state.username}
-              updateAfterLeavingTable={this.updateAfterLeavingTable} />
+              <Nav
+                isLoggedIn={this.state.isLoggedIn}
+                id={this.state.id}
+                table_id={this.state.table_id}
+                username={this.state.username}
+                updateAfterLeavingTable={this.updateAfterLeavingTable} />
             <Route exact path="/"
               render={(socket, joinRoom) =>{
                 return(

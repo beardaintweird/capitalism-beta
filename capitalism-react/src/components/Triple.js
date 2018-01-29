@@ -18,8 +18,8 @@ import React, {Component} from 'react';
      return (
        <div>
        {this.props.isTurn && this.props.enabled?
-        <button onClick={this.handleClick}>Triple {this.props.title}s</button>
-      : <button onClick={this.handleClick} disabled>Triple {this.props.title}s</button>}
+        <button className="tableButtons" onClick={this.handleClick}>Triple {this.props.title}s</button>
+      : <button className="tableButtons" onClick={this.handleClick} disabled>Triple {this.props.title}s</button>}
        </div>
      )
    }

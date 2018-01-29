@@ -15,13 +15,12 @@ class Completion extends Component {
    this.props.playCompletion(this.props.data)
  }
  render() {
+   let complete = '';
+   if(this.props.enabled)
+    complete = (<button onClick={this.handleClick}>Complete the {this.props.title}s!</button>)
    return (
      <div>
-     {
-       this.props.enabled ?
-        <button onClick={this.handleClick}>Complete the {this.props.title}s!</button>
-        : <button disabled>Nothing to complete</button>
-     }
+      {complete}
      </div>
    )
  }

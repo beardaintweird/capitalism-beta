@@ -1,0 +1,15 @@
+nav {
+  background: rgba(0,0,0,0.01);
+  border: none;
+}
+nav a {
+  opacity: 1;
+  color: white;
+}
+.left {
+  color: white;
+  padding-left: 2em;
+}
+.right a {
+  padding-right: 2em;
+}

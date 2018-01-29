@@ -1,28 +1,17 @@
+:root {
+  font-family: 'sans-serif';
+  letter-spacing: .1em;
+
+}
 .App {
+  overflow-y:scroll;
   text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  /* background: radial-gradient(#32CD32,	#013220); */
+  /* background: linear-gradient(#00FF00,#32CD32); */
+  /* background: radial-gradient(#00FF00 350px,#32CD32); */
+  /* background: linear-gradient(to right,#52c234,#061700); */
+  background: radial-gradient(#93F9B9,#1D976C);
+  /* background: #228B22 */
+  /* background: radial-gradient(#00FF00,#228B22); */
+  min-height: 110vh;
 }

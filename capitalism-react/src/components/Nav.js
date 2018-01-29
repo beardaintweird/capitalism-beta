@@ -50,16 +50,19 @@ class Nav extends Component {
    })
  }
  render() {
+   let links;
+   if(this.props.isLoggedIn){
+     links = (<div><NavLink exact onClick={this.handleClick} to="/">Tables</NavLink>
+              <NavLink onClick={this.logout} to="/login">Logout</NavLink></div>)
+   } else {
+     links = (<NavLink onClick={this.handleClick} to="/login">Login</NavLink>)
+   }
    return (
      <nav>
-      {this.props.isLoggedIn ?
-        <div>
-          <NavLink exact onClick={this.handleClick} to="/">Tables</NavLink>&nbsp;
-          <NavLink onClick={this.logout} to="/login">Logout</NavLink>
-        </div>
-        : <NavLink onClick={this.handleClick} to="/login">Login</NavLink>
-
-      }
+      <div className="left"><NavLink exact to="/">Capitalism</NavLink></div>
+       <div className="right">
+        {links}
+       </div>
      </nav>
    )
  }

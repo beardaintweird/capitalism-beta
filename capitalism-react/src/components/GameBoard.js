@@ -157,7 +157,6 @@ class GameBoard extends Component {
             player.hand = JSON.parse(player.hand)
             return player
           })
-          console.log(table);
           this.updatePlayer(table.players)
           if(table.playedCards)
             this.updatePlayedCards(JSON.parse(table.playedCards),false)
@@ -184,7 +183,6 @@ class GameBoard extends Component {
       playerNames.push(player.username)
       return player.username === this.props.username
     })[0];
-    console.log(this_player.timer, players);
     if(!this.state.playerNames.length){
       this.setState({
         players: players,
@@ -207,7 +205,6 @@ class GameBoard extends Component {
         this_player:this_player,
         hand: this_player.hand
       }, () => {
-        console.log(this.state.this_player.isTurn, this.state.game_underway);
         if(this.state.this_player.isTurn && this.state.game_underway){
           this.props.socket.emit('resume_timer', this.state.players, this.state.this_player, this.props.table_id)
         }
@@ -306,8 +303,6 @@ class GameBoard extends Component {
     if(this.state.this_player.isTurn){
       if(this.state.timer > 0)
         timer = (<p className="timer">{this.state.timer}</p>)
-    } else {
-      timer = (<p>Not your turn</p>)
     }
 
     // joining the socket room if not already joined
@@ -352,11 +347,11 @@ class GameBoard extends Component {
       && !this.state.game_underway
       && this.state.players.length > 3
     ){
-      gameButton = (<button onClick={this.startGame}>Start Game</button>)
+      gameButton = (<button className="tableButtons" onClick={this.startGame}>Start Game</button>)
     } else if(!this.state.game_underway) {
       needMorePlayersMessage = (<p>Need {4 - this.state.players.length} more player(s) to start the game...</p>)
     } else if (this.state.game_underway){
-      gameButton = (<button onClick={this.endGame}>End Game</button>)
+      gameButton = (<button className="tableButtons" onClick={this.endGame}>End Game</button>)
     }
 
     // for piles when the first round is over
@@ -373,24 +368,22 @@ class GameBoard extends Component {
           {players}
           {timer}
         </div>
-        <div className="row"><PlayedCards cards={this.state.played_cards} /></div>
+        <div className="row playedCards"><PlayedCards cards={this.state.played_cards} /></div>
         {pileSelection}
-        <div className="row">
-          <Hand
-            hand={this.state.hand}
-            isTurn={this.state.this_player.isTurn}
-            pass={this.pass}
-            playCard={this.playCard}
-            topCard={topCard}
-            bomb={this.bomb}
-            playDoubles={this.playDoubles}
-            playTriples={this.playTriples}
-            autoComplete={this.autoComplete}
-            isDoublesOnly={this.state.isDoublesOnly}
-            isTriplesOnly={this.state.isTriplesOnly}
-            completion={completion}
-            />
-        </div>
+        <Hand
+          hand={this.state.hand}
+          isTurn={this.state.this_player.isTurn}
+          pass={this.pass}
+          playCard={this.playCard}
+          topCard={topCard}
+          bomb={this.bomb}
+          playDoubles={this.playDoubles}
+          playTriples={this.playTriples}
+          autoComplete={this.autoComplete}
+          isDoublesOnly={this.state.isDoublesOnly}
+          isTriplesOnly={this.state.isTriplesOnly}
+          completion={completion}
+          />
         <div className="row">
           {gameButton}
           {needMorePlayersMessage}

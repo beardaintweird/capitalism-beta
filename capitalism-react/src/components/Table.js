@@ -55,29 +55,23 @@ class Table extends Component {
  }
  render() {
    let enabled    = this.shouldUserJoinTable();
-   let joinButton = this.props.playerTableId < 0 ? (<button onClick={this.handleClick} >Join</button>) : '';
+   let joinButton = this.props.playerTableId < 0 ? (<button className="tableButtons" onClick={this.handleClick} >Join</button>) : '';
    let goButton   = this.props.table_id === this.props.playerTableId
     ? (<div>
-        <button onClick={this.goToGameBoard}>Go</button>
-        <br/><br/>
-        <button onClick={this.handleLeaveTable}>Leave</button>
+        <button id="go" className="tableButtons" onClick={this.goToGameBoard}>Go</button>
+        <button id="leave" className="tableButtons" onClick={this.handleLeaveTable}>Leave</button>
       </div>) : '';
    return (
-     <div className="col s3">
-      <div className="card white">
-        <div className="card-content black-text">
-          <span className="card-title">{this.props.table_name}</span>
-          <ul>
-            {this.props.players ? this.props.players.map((player) => {
-              return (<li key={player}>{player}</li>)
-            }) : 'no players'
-          }
-          </ul>
-          {joinButton}
-          {goButton}
-        </div>
-      </div>
-     </div>
+     <div className="col s3 table">
+      <h5 className="title">{this.props.table_name}</h5>
+      <ul>
+        {this.props.players ? this.props.players.map((player) => {
+          return (<li className="names" key={player}>{player}</li>)
+        }) : 'no players'}
+      </ul>
+      {joinButton}
+      {goButton}
+    </div>
    )
  }
 }

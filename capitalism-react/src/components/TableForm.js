@@ -53,7 +53,7 @@ import React, {Component} from 'react';
       })
       .then(res=>res.json())
       .then((result_two) => {
-        console.log(result_two);
+        console.log(result_two)
         this.props.updateTables(this.state.table_id)
         // this.props.joinRoom(this.state.table_id)
         // this.props.history.push(`/gameboard/${this.state.table_id}`)
@@ -63,12 +63,13 @@ import React, {Component} from 'react';
 
    render() {
      return (
-       <form onSubmit={this.handleSubmit}>
+       <form className="makeTable" onSubmit={this.handleSubmit}>
+        <h5>Make your own table</h5>
         <label>
           Name:
           <input type="text" value={this.state.table_name} onChange={this.handleChange} />
         </label>
-        <input type="submit" value="Submit" />
+        <input className="tableButtons" type="submit" value="Submit" />
       </form>
      )
    }
