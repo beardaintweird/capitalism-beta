@@ -150,7 +150,7 @@ io.on('connection', (socket) => {
   */
   socket.on('resume_timer', (players, this_player, table_id) => {
     console.log('IN RESUME TIMER');
-    let newTime = this_player.timer === -1 ? 10 : this_player.timer - 1
+    let newTime = 10
     let playerIndex = arrayObjectIndexOf(players, this_player.username, 'username');
     if(interval) clearInterval(interval)
     interval = setInterval(() => {
@@ -163,6 +163,7 @@ io.on('connection', (socket) => {
   socket.on('pass', (players, username, played_cards, table_id) => {
     let playerIndex = arrayObjectIndexOf(players, username, 'username');
     changeTurns(players, playerIndex);
+    updatePlayer(players[playerIndex])
     playerIndex = playerIndex === players.length -1 ? 0 : ++playerIndex;
     if(played_cards.length > 1
         && players[playerIndex].username === played_cards[played_cards.length - 1].username){

@@ -48,7 +48,7 @@ class GameBoard extends Component {
     ==================================================
     */
     this.props.socket.on('table_joined', () => {
-      console.log('You have joined the table.')
+      console.log('You have joined the table. ')
       if(this.state.players.length < 4){
         getTablePlayers(this.props.table_id)
           .then((table) => {
@@ -227,7 +227,7 @@ class GameBoard extends Component {
     this.props.socket.emit('select_pile', this.state.players, this.state.this_player.username, pile, allPiles, this.props.table_id)
   }
   pass(e){
-    console.log(`${this.state.this_player.username} passes `);
+    console.log(`${this.state.this_player.username} passes`);
     this.props.socket.emit('pass', this.state.players, this.state.this_player.username, this.state.played_cards, this.props.table_id)
   }
   playCard(card){
