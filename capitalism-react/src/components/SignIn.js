@@ -38,57 +38,28 @@ class SignIn extends Component {
    render() {
      return (
        <div>
-       <div className="section"></div>
-         <main>
-           <center>
-             <div className="section"></div>
+         <form className="signIn" onSubmit={this.handleSubmit}>
+          <h5 className="heading">Capitalism</h5>
 
-             <h5 className="indigo-text">Please, login into your account</h5>
-             <div className="section"></div>
-
-             <div className="container">
-               <div className="z-depth-1 grey lighten-4 row" style={{display: 'inline-block', paddingTop: 32,paddingRight: 48,paddingBottom: 0,paddingLeft: 48}}>
-
-                 <form className="col s12" onSubmit={this.handleSubmit}>
-                   <div className='row'>
-                     <div className='col s12'>
-                     </div>
-                   </div>
-
-                   <div className='row'>
-                     <div className='input-field col s12'>
-                       <input className='validate' onChange={this.handleChange} type='email' name='email' id='email' />
-                       <label htmlFor='email'>Enter your email</label>
-                     </div>
-                   </div>
-
-                   <div className='row'>
-                     <div className='input-field col s12'>
-                       <input className='validate' onChange={this.handleChange} type='password' name='password' id='password' />
-                       <label htmlFor='password'>Enter your password</label>
-                     </div>
-                     <label style={{float: 'right'}}>
-                       <a className='pink-text' href='#!'><b>Forgot Password?</b></a>
-                     </label>
-                     <p>{this.state.error}</p>
-                   </div>
-
-                   <br />
-                   <center>
-                     <div className='row'>
-                       <button type='submit' name='btn_login' className='col s12 btn btn-large waves-effect indigo'>Login</button>
-                     </div>
-                   </center>
-                 </form>
-               </div>
-             </div>
-             <a href="/signup">Create account</a>
-           </center>
-
-           <div className="section"></div>
-           <div className="section"></div>
-         </main>
-
+           <div className='input-field col s8'>
+             <input className='input' onChange={this.handleChange} type='email' name='email' id='email' />
+             <label htmlFor='email'>
+              {this.state.email ? '' : 'email'}
+             </label>
+           </div>
+           <div className='input-field col s8'>
+             <input className='' onChange={this.handleChange} type='password' name='password' id='password' />
+             <label htmlFor='password' className="input">
+              {this.state.password ? '' : 'password'}
+             </label>
+           </div>
+           <p>{this.state.error}</p>
+           <button type='submit' name='btn_login' className='tableButtons login'>sign in</button><br/>
+           <label>
+             <a className='otherText' href='#!'><b>Forgot Password?</b></a>
+           </label>
+         </form>
+         <a className="otherText" href="/signup">Create account</a>
        </div>
      )
    }

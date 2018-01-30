@@ -82,15 +82,17 @@ img {
   padding: 0.2em 1em;
   color: white;
   font-size: 1.1rem;
-  background-color: rgba(0,0,0,.25);
+  background-color: rgba(0,0,0,.75);
+  transition: all 0.25s linear;
 }
 .tableButtons:enabled {
 
 }
 .tableButtons:enabled:hover {
   transition: all 0.25s linear;
-  background-color: white;
-  color: #1D976C;
+  background-color: black;
+  color: #93F9B9;
+  border: 2px solid #93F9B9;
 }
 .tableButtons:disabled {
   /* transition: all 0.25s linear; */

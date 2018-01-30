@@ -16,13 +16,56 @@ body {
 .input-field input[type=text]:focus + label,
 .input-field input[type=email]:focus + label,
 .input-field input[type=password]:focus + label {
-  color: #e91e63;
+  color: #93F9B9 !important;
 }
 
 .input-field input[type=date]:focus,
 .input-field input[type=text]:focus,
 .input-field input[type=email]:focus,
 .input-field input[type=password]:focus {
-  border-bottom: 2px solid #e91e63;
+  border-bottom: 2px solid #93F9B9 !important;
   box-shadow: none;
+  color: #93F9B9 !important;
+}
+.signIn {
+  width: 50%;
+  min-height: 33vh;
+  background-color: rgba(0,0,0,.25);
+  margin: 2em auto;
+  margin-top: 5em;
+  padding: 1em;
+  border: 1px solid #93F9B9;
+  border-radius: 5px;
+}
+.heading {
+  text-align: center;
+  margin: 0 auto;
+  color: white;
+  font-size: 2em;
+  /* opacity: .75; */
+}
+.login {
+  margin: 0 auto;
+}
+.input-field input {
+  border-bottom: 1px solid #1D976C;
+}
+.input-field label {
+  color: #93F9B9;
+  opacity: 0.75;
+}
+.input-field:focus {
+  border-bottom: 2px solid #93F9B9;
+  box-shadow: none;
+}
+
+.input {
+}
+.otherText {
+  color: black;
+  transition: all .25s linear;
+}
+.otherText:hover {
+  color: white;
+  /* border-bottom: 1px solid white; */
 }
