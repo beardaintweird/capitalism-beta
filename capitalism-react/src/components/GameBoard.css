@@ -34,5 +34,73 @@ img {
 }
 .timer {
   font-size: 2em;
-  color:  red;
+  color:  white;
+}
+.active {
+  font-weight: 800;
+  color: black;
+}
+.inactive {
+  font-weight: 200;
+  color: lightgrey;
+}
+.prev_ranking {
+  font-size: 0.8rem;
+  font-weight: 200;
+  color: lightgrey;
+}
+.top_card {
+  margin-left: 5px;
+  margin-top: 5px;
+  z-index: 2;
+  background-color: white;
+  border: 1px solid black;
+  padding: 1px;
+  border-radius: 2px;
+}
+.bottom_card{
+  position: absolute;
+  z-index: -1;
+}
+.pile {
+  display: inline-block;
+  padding: 4px;
+}
+.completion {
+  /* animate! */
+}
+
+#go {
+  margin-left: 0;
+}
+#leave {
+  margin-left: 10px;
+  margin-bottom: 1em;
+}
+.tableButtons {
+  border: 2px solid #1D976C;
+  padding: 0.2em 1em;
+  color: white;
+  font-size: 1.1rem;
+  background-color: rgba(0,0,0,.25);
+}
+.tableButtons:enabled {
+
+}
+.tableButtons:enabled:hover {
+  transition: all 0.25s linear;
+  background-color: white;
+  color: #1D976C;
+}
+.tableButtons:disabled {
+  /* transition: all 0.25s linear; */
+  color: #93F9B9;
+}
+.table {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-bottom: 1em;
+}
+.myTurn {
+  color: white;
 }

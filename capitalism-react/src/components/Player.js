@@ -10,9 +10,11 @@ class Player extends Component {
  }
  render() {
    let name;
+   let classes = []
    if(this.props.isTurn) {
-     // console.log(`It's ${this.props.username}'s turn`);
-     name = (<p className="active">{this.props.username}</p>)
+     classes.push('active')
+     this.props.username === this.props.yourUsername ? classes.push('myTurn') : ''
+     name = (<p className={classes.join(' ')}>{this.props.username}</p>)
    } else {
      name = (<p className="inactive">{this.props.username}</p>)
    }

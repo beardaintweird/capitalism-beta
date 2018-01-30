@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import './PileSelection.css';
 import Pile from './Pile';
 
 class PileSelection extends Component {

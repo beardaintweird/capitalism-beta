@@ -1,7 +1,9 @@
 :root {
   font-family: 'sans-serif';
   letter-spacing: .1em;
-
+}
+* {
+  letter-spacing: .1em;
 }
 .App {
   overflow-y:scroll;

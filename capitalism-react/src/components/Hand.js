@@ -133,6 +133,7 @@ createDoublesTriplesAutos(){
       doublesTriplesAutos.push(auto);
     }
   }
+  
   return doublesTriplesAutos;
 }
 componentDidMount(){
@@ -178,10 +179,10 @@ render() {
       {cards}
     </div>
     <div className="col s3">
+      {this.props.completion}
       {specials}
     </div>
     <div className="col s12">
-      {this.props.completion}<br/>
       {pass}
     </div>
 

@@ -52,6 +52,7 @@ class GameBoard extends Component {
       if(this.state.players.length < 4){
         getTablePlayers(this.props.table_id)
           .then((table) => {
+            console.log(table);
             this.setState({
               players: table.players
             })
@@ -320,6 +321,7 @@ class GameBoard extends Component {
                   previousRanking={prevRanking}
                   ranking={player.ranking}
                   username={player.username}
+                  yourUsername={this.props.username}
                   />)
       })
     }
@@ -339,7 +341,7 @@ class GameBoard extends Component {
         playCompletion={this.playCompletion}
         enabled={true}/>)
     } else {
-      completion = (<Completion enabled={false} />)
+      completion = (<Completion game_underway={this.state.game_underway} enabled={false} />)
     }
 
     // for the start button or how many players needed message
@@ -349,7 +351,10 @@ class GameBoard extends Component {
     ){
       gameButton = (<button className="tableButtons" onClick={this.startGame}>Start Game</button>)
     } else if(!this.state.game_underway) {
-      needMorePlayersMessage = (<p>Need {4 - this.state.players.length} more player(s) to start the game...</p>)
+      if(4-this.state.players.length === 0)
+        needMorePlayersMessage = (<p>Waiting for "{this.state.players[0].username}" to start the game</p>)
+      else
+        needMorePlayersMessage = (<p>Need {4 - this.state.players.length} more player(s) to start the game...</p>)
     } else if (this.state.game_underway){
       gameButton = (<button className="tableButtons" onClick={this.endGame}>End Game</button>)
     }

@@ -1,29 +1,30 @@
 import React, {Component} from 'react';
-import './Completion.css';
 
 class Completion extends Component {
- constructor(props){
+  constructor(props){
    super(props);
    this.state = {}
    this.handleClick = this.handleClick.bind(this);
- }
- componentDidMount(){
+  }
+  componentDidMount(){
 
- }
- handleClick(){
-   console.log('handling completion click. ');
+  }
+  handleClick(){
+   console.log('handling completion click.');
    this.props.playCompletion(this.props.data)
- }
- render() {
+  }
+  render() {
    let complete = '';
    if(this.props.enabled)
-    complete = (<button className="tableButtons special" onClick={this.handleClick}>Complete the {this.props.title}s!</button>)
+    complete = (<button className="tableButtons special completion" onClick={this.handleClick}>Complete the {this.props.title}s!</button>)
+  else if(this.props.game_underway)
+    complete = (<button className="tableButtons special" disabled>No completions</button>)
    return (
      <div>
       {complete}
      </div>
    )
- }
+  }
 }
 
- export default Completion
+export default Completion

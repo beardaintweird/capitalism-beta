@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import './Pile.css';
 
 class Pile extends Component {
   constructor(props){
