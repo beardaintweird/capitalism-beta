@@ -24,6 +24,14 @@
   background-color: white;
   margin-left: -25px;
   border-radius: 5px;
+  opacity: 1;
+  transition: all 0.25s linear;
+}
+.enabled button {
+  background-color: rgba(0,0,0,0);
+}
+.disabled button {
+  background-color: rgba(0,0,0,0.15);
 }
 img {
   width: 75px;

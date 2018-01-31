@@ -133,7 +133,7 @@ createDoublesTriplesAutos(){
       doublesTriplesAutos.push(auto);
     }
   }
-  
+
   return doublesTriplesAutos;
 }
 componentDidMount(){

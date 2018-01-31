@@ -19,6 +19,8 @@ class Card extends Component {
    }
  }
  render() {
+   let classes = ['card'];
+   this.props.enable && this.props.isTurn ? classes.push('enabled') : classes.push('disabled')
    let card = (
      <button onClick={this.handleClick} disabled>
        <img src={this.props.imageSrc} alt='' />
@@ -29,7 +31,7 @@ class Card extends Component {
                 </button>)
    }
    return (
-     <div className="card">
+     <div className={classes.join(' ')}>
       {card}
      </div>
    )

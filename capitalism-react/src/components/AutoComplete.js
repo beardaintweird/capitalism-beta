@@ -20,7 +20,12 @@ class AutoComplete extends Component {
     else
       auto = (<button className="tableButtons special" onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>)
      return (
-       {auto}
+       <div>
+       {this.props.isTurn && this.props.enabled
+       ? <button className="tableButtons special" onClick={this.handleClick}>Auto complete {this.props.title}s</button>
+       : <button className="tableButtons special" onClick={this.handleClick} disabled>Auto complete {this.props.title}s</button>}
+       </div>
+
      )
    }
 }
