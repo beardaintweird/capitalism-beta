@@ -3,7 +3,7 @@
   margin-bottom: 2em;
 }
 .makeTable h5 {
-  color: white;
+  color: dimgray;
   font-size: 1.75em;
 }
 .makeTable label , input[type="text"] {

@@ -79,6 +79,7 @@ img {
 }
 .tableButtons {
   border: 2px solid #1D976C;
+  border-radius: 3px;
   padding: 0.2em 1em;
   color: white;
   font-size: 1.1rem;
@@ -99,9 +100,41 @@ img {
   color: #93F9B9;
 }
 .table {
-  border: 1px solid black;
+  /* background: linear-gradient(#1D976C,#93F9B9); */
+  background: linear-gradient(to left, rgba(147,249,185,0.75), rgba(29,151,108,0.25));
+  border: 1px solid #1D976C;
+  box-shadow: 0px 0px 2px black;
   border-radius: 5px;
   padding-bottom: 1em;
+  padding: 1em !important;
+  box-sizing: border-box !important;
+}
+.table .tableButtons {
+  background-color: rgba(255,255,255,0.5);
+  color: #1D976C;
+}
+.table .tableButtons:enabled:hover {
+  transition: all 0.25s linear;
+  background-color: rgba(0,0,0,0.5);
+  color: #93F9B9;
+  border: 2px solid #93F9B9;
+}
+.GameBoard .tableButtons {
+  background-color: rgba(255,255,255,0.5);
+  color: #1D976C;
+}
+.GameBoard .tableButtons:enabled:hover {
+  transition: all 0.25s linear;
+  background-color: rgba(0,0,0,0.5);
+  color: #93F9B9;
+  border: 2px solid #93F9B9;
+}
+.tableRow {
+  padding-top: 2em;
+}
+.title {
+  /* color: rgba(255,255,255,.85); */
+  color: white;
 }
 .myTurn {
   color: white;

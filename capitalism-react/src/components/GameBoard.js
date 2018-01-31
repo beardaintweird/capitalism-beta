@@ -368,7 +368,7 @@ class GameBoard extends Component {
           isTurn={this.state.this_player.isTurn}/>)
     }
     return (
-      <div className="container">
+      <div className="container GameBoard">
         <div className="row">
           {players}
           {timer}

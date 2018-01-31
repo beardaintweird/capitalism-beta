@@ -12,7 +12,10 @@
   /* background: linear-gradient(#00FF00,#32CD32); */
   /* background: radial-gradient(#00FF00 350px,#32CD32); */
   /* background: linear-gradient(to right,#52c234,#061700); */
-  background: radial-gradient(#93F9B9,#1D976C);
+  /* background: radial-gradient(#93F9B9,#1D976C); */
+  /* background: linear-gradient(to right,rgba(29,151,108,0.75),rgba(147,249,185,0.75)); */
+  /* background: linear-gradient(rgba(29,151,108,0.75),rgba(255,255,255,0.75)); */
+  background: linear-gradient(rgba(29,151,108,0.75),rgba(147,249,185,0.25));
   /* background: #228B22 */
   /* background: radial-gradient(#00FF00,#228B22); */
   min-height: 110vh;

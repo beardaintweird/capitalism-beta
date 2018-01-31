@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import './TableMenu.css';
 import TableForm from './TableForm';
 
 import Table from './Table';
@@ -45,13 +44,14 @@ import { withRouter } from 'react-router-dom';
      return (
        <div className="container">
         <div className="row">
-          <div className="col s4">
+          <div className="col s4"></div>
+          <div className="col s4 signIn">
             {tableForm}
           </div>
-          <div className="col s8">
-          </div>
+          <div className="col s4"></div>
         </div>
-        <div className="row">
+        <br/><br/><br/><br/><br/>
+        <div className="row tableRow">
           {tables}
         </div>
        </div>
