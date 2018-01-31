@@ -355,7 +355,7 @@ class GameBoard extends Component {
         needMorePlayersMessage = (<p>Waiting for "{this.state.players[0].username}" to start the game</p>)
       else
         needMorePlayersMessage = (<p>Need {4 - this.state.players.length} more player(s) to start the game...</p>)
-    } else if (this.state.game_underway){
+    } else if (this.state.game_underway && this.state.playerNames[0] === this.props.username){
       gameButton = (<button className="tableButtons" onClick={this.endGame}>End Game</button>)
     }
 

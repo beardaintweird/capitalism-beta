@@ -147,3 +147,7 @@ img {
 .myTurn {
   color: white;
 }
+.playedCards {
+  min-height: 20vh;
+
+}
